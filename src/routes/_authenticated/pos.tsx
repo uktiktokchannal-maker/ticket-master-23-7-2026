@@ -150,6 +150,51 @@ function POSPage() {
     return Array.from({ length: selectedTrip.capacity }, (_, i) => i + 1);
   }, [selectedTrip]);
 
+  const seatMap = useMemo(() => {
+    if (!selectedTrip) return null;
+    return (
+      <div className="grid grid-cols-[1fr_1fr_1.5rem_1fr_1fr] gap-y-3 justify-items-center">
+        {Array.from({ length: Math.ceil(allSeatsForDisplay.length / 4) }).map((_, rowIndex) => {
+          return Array.from({ length: 4 }).map((_, colIndex) => {
+            const seatNum = rowIndex * 4 + colIndex + 1;
+            if (seatNum > allSeatsForDisplay.length) return <div key={`empty-${rowIndex}-${colIndex}`} />;
+
+            const isBooked = selectedTrip.booked_seats.includes(seatNum);
+            const isInCart = cartSeatsForTrip.includes(seatNum);
+
+            const btn = (
+              <button
+                key={seatNum}
+                onClick={() => handleSeatClick(seatNum)}
+                disabled={isBooked || isInCart}
+                className={`relative flex h-10 w-10 items-center justify-center rounded-lg border-2 tabular-nums text-sm font-bold transition-transform hover:scale-105 active:scale-95 ${
+                  isBooked
+                    ? "cursor-not-allowed border-destructive/30 bg-destructive/10 text-destructive/60"
+                    : isInCart
+                      ? "cursor-not-allowed border-warning bg-warning text-warning-foreground shadow-lg shadow-warning/20"
+                      : "border-primary/20 bg-card text-foreground hover:border-primary hover:text-primary hover:shadow-md"
+                }`}
+              >
+                {seatNum}
+              </button>
+            );
+
+            if (colIndex === 1) {
+              return (
+                <div key={`group-${rowIndex}-${colIndex}`} className="contents">
+                  {btn}
+                  <div className="w-full"></div>
+                </div>
+              );
+            }
+
+            return btn;
+          });
+        })}
+      </div>
+    );
+  }, [selectedTrip, cartSeatsForTrip, allSeatsForDisplay]);
+
   function handleSeatClick(seat: number) {
     if (!selectedTrip) return;
     if (selectedTrip.booked_seats.includes(seat) || cartSeatsForTrip.includes(seat)) return;
@@ -200,8 +245,6 @@ function POSPage() {
         seat_number: c.seat,
         amount: Math.max(0, c.trip.price - perTicketDiscount),
         status: "confirmed" as const,
-        payment_method: pay,
-        discount: perTicketDiscount,
       }));
 
       const { error } = await supabase.from("bookings").insert(bookings);
@@ -318,47 +361,7 @@ function POSPage() {
                   <div className="h-6 w-16 rounded-full bg-muted-foreground/20"></div> {/* Driver area placeholder */}
                 </div>
                 
-                {useMemo(() => (
-                  <div className="grid grid-cols-[1fr_1fr_1.5rem_1fr_1fr] gap-y-3 justify-items-center">
-                    {Array.from({ length: Math.ceil(allSeatsForDisplay.length / 4) }).map((_, rowIndex) => {
-                      return Array.from({ length: 4 }).map((_, colIndex) => {
-                        const seatNum = rowIndex * 4 + colIndex + 1;
-                        if (seatNum > allSeatsForDisplay.length) return <div key={`empty-${rowIndex}-${colIndex}`} />;
-                        
-                        const isBooked = selectedTrip.booked_seats.includes(seatNum);
-                        const isInCart = cartSeatsForTrip.includes(seatNum);
-                        
-                        const btn = (
-                          <button
-                            key={seatNum}
-                            onClick={() => handleSeatClick(seatNum)}
-                            disabled={isBooked || isInCart}
-                            className={`relative flex h-10 w-10 items-center justify-center rounded-lg border-2 tabular-nums text-sm font-bold transition-transform hover:scale-105 active:scale-95 ${
-                              isBooked
-                                ? "cursor-not-allowed border-destructive/30 bg-destructive/10 text-destructive/60"
-                                : isInCart
-                                  ? "cursor-not-allowed border-warning bg-warning text-warning-foreground shadow-lg shadow-warning/20"
-                                  : "border-primary/20 bg-card text-foreground hover:border-primary hover:text-primary hover:shadow-md"
-                            }`}
-                          >
-                            {seatNum}
-                          </button>
-                        );
-
-                        if (colIndex === 1) {
-                          return (
-                            <div key={`group-${rowIndex}-${colIndex}`} className="contents">
-                              {btn}
-                              <div className="w-full"></div>
-                            </div>
-                          );
-                        }
-                        
-                        return btn;
-                      });
-                    })}
-                  </div>
-                ), [selectedTrip.booked_seats, cartSeatsForTrip, allSeatsForDisplay])}
+                {seatMap}
               </div>
             </motion.div>
           )}
