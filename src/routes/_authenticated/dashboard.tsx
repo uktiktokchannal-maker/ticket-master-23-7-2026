@@ -568,7 +568,7 @@ function DashboardPage() {
           )}
         </Card>
       </section>
-    </motion.div>
+    </div>
   );
 }
 
