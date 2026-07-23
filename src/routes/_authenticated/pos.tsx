@@ -245,8 +245,6 @@ function POSPage() {
         seat_number: c.seat,
         amount: Math.max(0, c.trip.price - perTicketDiscount),
         status: "confirmed" as const,
-        payment_method: pay,
-        discount: perTicketDiscount,
       }));
 
       const { error } = await supabase.from("bookings").insert(bookings);
