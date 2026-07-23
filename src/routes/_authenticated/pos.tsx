@@ -25,6 +25,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { TicketPrintView, type TicketData } from "@/components/ticket-print";
+
 
 export const Route = createFileRoute("/_authenticated/pos")({
   component: POSPage,
