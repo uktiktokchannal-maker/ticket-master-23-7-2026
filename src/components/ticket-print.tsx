@@ -189,10 +189,21 @@ export function TicketPrintView({
               إغلاق
             </Button>
           )}
-          <Button onClick={() => window.print()}>
+          <Button
+            onClick={() => {
+              document.body.classList.add("tickets-print-mode");
+              const cleanup = () => {
+                document.body.classList.remove("tickets-print-mode");
+                window.removeEventListener("afterprint", cleanup);
+              };
+              window.addEventListener("afterprint", cleanup);
+              setTimeout(() => window.print(), 60);
+            }}
+          >
             <Printer className="me-2 h-4 w-4" />
             طباعة
           </Button>
+
         </div>
       </div>
       <div className="tickets-print-area space-y-6">
