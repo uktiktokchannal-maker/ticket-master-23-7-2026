@@ -524,6 +524,32 @@ function POSPage() {
           </div>
         </div>
       </div>
+
+      {/* Issued tickets — auto-open after checkout for immediate printing */}
+      <Dialog
+        open={!!issuedTickets}
+        onOpenChange={(o) => {
+          if (!o) {
+            document.body.classList.remove("tickets-print-mode");
+            setIssuedTickets(null);
+          }
+        }}
+      >
+        <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>التذاكر جاهزة للطباعة</DialogTitle>
+            <DialogDescription>
+              اضغط طباعة لإصدار التذاكر مباشرة للمسافرين.
+            </DialogDescription>
+          </DialogHeader>
+          {issuedTickets && (
+            <TicketPrintView
+              tickets={issuedTickets}
+              onClose={() => setIssuedTickets(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
