@@ -63,6 +63,8 @@ function POSPage() {
   const [selectedSeatForBooking, setSelectedSeatForBooking] = useState<number | null>(null);
   const [pay, setPay] = useState<PayMethod>("cash");
   const [discount, setDiscount] = useState(0);
+  const [issuedTickets, setIssuedTickets] = useState<TicketData[] | null>(null);
+
 
   // Fetch upcoming trips with their booked seats (filtered by agency)
   const { data: tripsData, isLoading } = useQuery({
