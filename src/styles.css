@@ -1,0 +1,389 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * TICKETTY ERP Design System
+ * Enterprise dashboard — Arabic-first, RTL, dense but breathable.
+ * Inspired by Linear / Notion / Supabase dashboards.
+ * All colors are oklch semantic tokens. Never hardcode colors in components.
+ */
+
+@theme inline {
+  --font-sans: "Cairo", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Mada", "Cairo", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+
+  --shadow-card: 0 1px 2px 0 oklch(0.2 0.04 255 / 0.04), 0 1px 3px 0 oklch(0.2 0.04 255 / 0.06);
+  --shadow-elevated: 0 4px 12px -2px oklch(0.2 0.04 255 / 0.08), 0 2px 4px -1px oklch(0.2 0.04 255 / 0.04);
+}
+
+:root {
+  --radius: 0.9rem;
+
+  --background: #F5F8FC;
+  --foreground: #062E5B;
+
+  --card: #FFFFFF;
+  --card-foreground: #062E5B;
+
+  --popover: #FFFFFF;
+  --popover-foreground: #062E5B;
+
+  --primary: #008FC7;
+  --primary-foreground: #FFFFFF;
+  --primary-soft: #E6F4FA;
+
+  --secondary: #062E5B;
+  --secondary-foreground: #FFFFFF;
+
+  --muted: #E2E8F0;
+  --muted-foreground: #64748B;
+
+  --accent: #FF8500;
+  --accent-foreground: #FFFFFF;
+  --accent-soft: #FFF3E5;
+
+  --success: #16B364;
+  --success-foreground: #FFFFFF;
+
+  --warning: #F59E0B;
+  --warning-foreground: #FFFFFF;
+
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #008FC7;
+
+  --sidebar: #062E5B;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-border: #052448;
+  --sidebar-accent: #FF8500;
+  --sidebar-accent-foreground: #FFFFFF;
+}
+
+.dark {
+  --background: #021124;
+  --foreground: #F5F8FC;
+
+  --card: #062E5B;
+  --card-foreground: #F5F8FC;
+
+  --popover: #062E5B;
+  --popover-foreground: #F5F8FC;
+
+  --primary: #008FC7;
+  --primary-foreground: #FFFFFF;
+  --primary-soft: #00364D;
+
+  --secondary: #001B36;
+  --secondary-foreground: #FFFFFF;
+
+  --muted: #001B36;
+  --muted-foreground: #94A3B8;
+
+  --accent: #FF8500;
+  --accent-foreground: #FFFFFF;
+  --accent-soft: #4D2800;
+
+  --success: #16B364;
+  --success-foreground: #FFFFFF;
+
+  --warning: #F59E0B;
+  --warning-foreground: #FFFFFF;
+
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+
+  --border: #1E293B;
+  --input: #1E293B;
+  --ring: #008FC7;
+
+  --sidebar: #021124;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-border: #001B36;
+  --sidebar-accent: #FF8500;
+  --sidebar-accent-foreground: #FFFFFF;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-feature-settings: "cv02", "cv03", "cv04", "ss01";
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  /* Financial numbers should always be tabular */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer utilities {
+  .ticket-shape {
+    position: relative;
+    border-radius: var(--radius-xl);
+    mask-image: radial-gradient(circle at 0 50%, transparent 8px, black 9px),
+                radial-gradient(circle at 100% 50%, transparent 8px, black 9px);
+    mask-size: 51% 100%;
+    mask-repeat: no-repeat;
+    mask-position: left, right;
+  }
+
+  .brand-pattern {
+    background-image: 
+      linear-gradient(45deg, transparent 48%, var(--color-primary-soft) 49%, var(--color-primary-soft) 51%, transparent 52%),
+      linear-gradient(-45deg, transparent 48%, var(--color-primary-soft) 49%, var(--color-primary-soft) 51%, transparent 52%);
+    background-size: 20px 20px;
+    opacity: 0.05;
+  }
+
+  .glass-card {
+    background: color-mix(in srgb, var(--color-card) 70%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  }
+
+  .interactive-glow {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .interactive-glow::before {
+    content: '';
+    position: absolute;
+    top: var(--y, 50%);
+    left: var(--x, 50%);
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--color-primary) 15%, transparent) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .interactive-glow:hover::before {
+    opacity: 1;
+  }
+}
+
+/* ========================================
+   Print Stylesheet — Default A4
+   ======================================== */
+@media print {
+  /* Hide navigation and interactive elements */
+  aside,
+  header,
+  .no-print,
+  button:not(.print-keep),
+  [aria-label="فتح القائمة"],
+  [aria-label="إغلاق القائمة"] {
+    display: none !important;
+  }
+
+  /* Reset layout for print */
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt;
+  }
+
+  /* Main content takes full width */
+  .flex.min-h-dvh {
+    display: block !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .mx-auto.max-w-7xl {
+    max-width: 100% !important;
+  }
+
+  /* Cards become flat */
+  .glass-card,
+  .rounded-2xl,
+  .rounded-3xl,
+  .shadow-card,
+  .shadow-elevated {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+    background: white !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Ticket print styling */
+  .ticket-shape {
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+  }
+
+  /* Tables */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th, td {
+    border: 1px solid #ccc !important;
+    padding: 6px 8px !important;
+  }
+
+  thead {
+    background: #f5f5f5 !important;
+  }
+
+  /* Ensure colors are printable */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
+
+  /* Animations off */
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* === Thermal Receipt Mode (80mm) ===
+     When .thermal-print-mode is on body, switch to receipt layout */
+  body.thermal-print-mode * {
+    visibility: hidden !important;
+  }
+
+  body.thermal-print-mode .thermal-receipt,
+  body.thermal-print-mode .thermal-receipt * {
+    visibility: visible !important;
+  }
+
+  body.thermal-print-mode .thermal-receipt {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 80mm !important;
+    max-width: 80mm !important;
+    padding: 3mm !important;
+    margin: 0 !important;
+    background: white !important;
+    color: black !important;
+    font-size: 9pt !important;
+    line-height: 1.3 !important;
+    font-family: "Courier New", "Cairo", monospace !important;
+    z-index: 99999 !important;
+  }
+
+  body.thermal-print-mode {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.thermal-print-mode .thermal-receipt table,
+  body.thermal-print-mode .thermal-receipt th,
+  body.thermal-print-mode .thermal-receipt td {
+    border: none !important;
+    padding: 1px 2px !important;
+    font-size: 9pt !important;
+  }
+
+  body.thermal-print-mode .thermal-receipt .receipt-header {
+    text-align: center;
+    font-weight: bold;
+    font-size: 11pt !important;
+    margin-bottom: 2mm;
+  }
+
+  body.thermal-print-mode .thermal-receipt .receipt-divider {
+    border-top: 1px dashed #000 !important;
+    margin: 2mm 0;
+  }
+
+  body.thermal-print-mode .thermal-receipt .receipt-tear {
+    border-top: 2px dashed #000 !important;
+    margin-top: 4mm;
+    padding-top: 2mm;
+    text-align: center;
+    font-size: 7pt !important;
+    color: #666 !important;
+  }
+
+  body.thermal-print-mode .thermal-receipt .receipt-qr {
+    text-align: center;
+    margin: 2mm 0;
+  }
+
+}
+
+@media print {
+  @page thermal {
+    margin: 0;
+    size: 80mm auto;
+  }
+}
