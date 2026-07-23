@@ -379,6 +379,29 @@
     margin: 2mm 0;
   }
 
+  /* === Tickety printable ticket === */
+  body.tickets-print-mode * {
+    visibility: hidden !important;
+  }
+  body.tickets-print-mode .tickets-print-area,
+  body.tickets-print-mode .tickets-print-area * {
+    visibility: visible !important;
+  }
+  body.tickets-print-mode .tickets-print-area {
+    position: fixed !important;
+    inset: 0 !important;
+    margin: 0 !important;
+    padding: 6mm !important;
+    background: white !important;
+    z-index: 99999 !important;
+    overflow: visible !important;
+  }
+  body.tickets-print-mode .ticket-printable {
+    page-break-after: always;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    break-inside: avoid;
+  }
 }
 
 @media print {
@@ -387,3 +410,4 @@
     size: 80mm auto;
   }
 }
+
