@@ -238,7 +238,6 @@ function POSPage() {
       if (!agencyId) throw new Error("لم يتم تحديد الوكالة");
       if (cart.length === 0) throw new Error("السلة فارغة");
 
-      // Calculate per-ticket discount (distribute evenly)
       const perTicketDiscount = cart.length > 0 ? Math.floor(discount / cart.length) : 0;
 
       const bookings = cart.map((c) => ({
@@ -251,16 +250,38 @@ function POSPage() {
         status: "confirmed" as const,
       }));
 
-      const { error } = await supabase.from("bookings").insert(bookings);
+      const { data: inserted, error } = await supabase
+        .from("bookings")
+        .insert(bookings)
+        .select("id, seat_number, trip_id, passenger_name, amount");
       if (error) {
         if (error.code === "23505") {
           throw new Error("عذراً، بعض المقاعد التي اخترتها تم حجزها للتو من قبل شخص آخر. يرجى تحديث الصفحة واختيار مقاعد أخرى.");
         }
         throw error;
       }
+
+      // Build ticket data by matching inserted rows back to cart items (by trip+seat)
+      const tripsById = new Map(cart.map((c) => [`${c.trip.id}-${c.seat}`, c] as const));
+      const tickets: TicketData[] = (inserted ?? []).map((row) => {
+        const cartItem = tripsById.get(`${row.trip_id}-${row.seat_number}`);
+        const trip = cartItem?.trip;
+        return {
+          id: row.id,
+          passenger_name: row.passenger_name,
+          bus_name: trip?.bus ?? "—",
+          seat_number: row.seat_number,
+          route: trip?.route ?? null,
+          departure_at: trip?.departure_at ?? null,
+          amount: Number(row.amount ?? 0),
+          currency: "ج.س",
+        };
+      });
+      return tickets;
     },
-    onSuccess: () => {
-      toast.success(`تم إصدار ${cart.length} تذكرة بمبلغ ${total.toLocaleString("ar-EG")} ج.س`);
+    onSuccess: (tickets) => {
+      toast.success(`تم إصدار ${tickets.length} تذكرة بمبلغ ${total.toLocaleString("ar-EG")} ج.س`);
+      setIssuedTickets(tickets);
       setCart([]);
       setDiscount(0);
       setSelectedTrip(null);
@@ -271,6 +292,7 @@ function POSPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
 
   return (
     <div className="space-y-6">
