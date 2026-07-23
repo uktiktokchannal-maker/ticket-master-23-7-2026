@@ -297,62 +297,44 @@ function DashboardPage() {
   const currency = profile.agency_currency;
 
   return (
-    <motion.div 
-      initial="hidden"
-      animate="show"
-      variants={{
-        hidden: { opacity: 0 },
-        show: {
-          opacity: 1,
-          transition: { staggerChildren: 0.1 }
-        }
-      }}
-      className="mx-auto max-w-7xl space-y-6"
-    >
-      {/* HERO */}
-      <motion.section 
-        variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { type: "spring" } } }}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-secondary to-primary p-6 text-primary-foreground shadow-elevated lg:p-10"
-      >
+    <div className="mx-auto max-w-7xl space-y-4">
+      {/* HERO — compact */}
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-secondary to-primary p-4 text-primary-foreground shadow-elevated lg:p-6">
         <div className="brand-pattern absolute inset-0 opacity-20"></div>
         <div
           aria-hidden
-          className="pointer-events-none absolute -end-24 -top-24 h-72 w-72 rounded-full bg-accent/30 blur-3xl"
+          className="pointer-events-none absolute -end-16 -top-16 h-48 w-48 rounded-full bg-accent/30 blur-3xl"
         />
-        <div className="relative grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:items-center">
+        <div className="relative grid gap-4 lg:grid-cols-[1.4fr_1fr] lg:items-center">
           <div className="min-w-0">
-            <h1 className="mt-2 font-display text-3xl font-extrabold lg:text-4xl">
+            <h1 className="font-display text-xl font-extrabold lg:text-2xl">
               أهلاً بك في تذكرتي 👋
             </h1>
-            <p className="mt-3 text-lg text-primary-foreground/90 font-medium">
-              إدارة ذكية لرحلاتك وحجوزاتك بكل سهولة
-            </p>
-            <div className="mt-4 flex gap-4 text-sm text-primary-foreground/70">
-              <span className="flex items-center gap-1.5">
-                <MapPin className="h-4 w-4" />
-                الموقع: {profile.agency_name || "السودان"}
+            <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-primary-foreground/70">
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                {profile.agency_name || "السودان"}
               </span>
-              <span className="flex items-center gap-1.5">
-                <CalendarClock className="h-4 w-4" />
+              <span className="flex items-center gap-1">
+                <CalendarClock className="h-3 w-3" />
                 {new Date().toLocaleDateString("ar", {
                   weekday: "long",
                   day: "numeric",
                   month: "long",
-                  year: "numeric",
                 })}
               </span>
             </div>
 
-            <div className="mt-6 flex flex-wrap items-end gap-x-6 gap-y-3">
+            <div className="mt-3 flex flex-wrap items-end gap-x-4 gap-y-2">
               <div className="min-w-0">
-                <p className="text-[11px] font-bold uppercase tracking-widest text-primary-foreground/60">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-primary-foreground/60">
                   إيرادات اليوم
                 </p>
-                <div className="mt-1 flex items-baseline gap-2">
-                  <span className="font-display text-4xl font-extrabold tabular lg:text-5xl">
+                <div className="mt-0.5 flex items-baseline gap-2">
+                  <span className="font-display text-2xl font-extrabold tabular lg:text-3xl">
                     {todayRevenue.toLocaleString("ar-EG", { maximumFractionDigits: 0 })}
                   </span>
-                  <span className="text-sm font-bold text-primary-foreground/70">{currency}</span>
+                  <span className="text-xs font-bold text-primary-foreground/70">{currency}</span>
                 </div>
               </div>
               <DeltaPill delta={revenueDelta} inverted />
@@ -364,22 +346,12 @@ function DashboardPage() {
             <QuickAction to="/trips" icon={BusFront} label="رحلة جديدة" />
             <QuickAction to="/manifest" icon={ScrollText} label="المنفستو" />
           </div>
-          
-          <div className="hidden lg:flex items-center justify-end">
-            <img
-              src={heroIllustration.url}
-              alt="TICKETTY"
-              className="h-40 w-auto object-contain drop-shadow-2xl"
-            />
-          </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* KPI GRID */}
-      <motion.section 
-        variants={{ hidden: { opacity: 0 }, show: { opacity: 1 } }}
-        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
-      >
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+
         <KpiCard
           label="حجوزات اليوم"
           value={String(todayBookings)}
@@ -417,13 +389,11 @@ function DashboardPage() {
                 : "جميعها جاهزة"
           }
         />
-      </motion.section>
+      </section>
 
       {/* CHART + FLEET DONUT */}
-      <motion.section 
-        variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
-        className="grid gap-4 lg:grid-cols-3"
-      >
+      <section className="grid gap-3 lg:grid-cols-3">
+
         <Card className="lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <div>
@@ -468,10 +438,11 @@ function DashboardPage() {
             </div>
           )}
         </Card>
-      </motion.section>
+      </section>
 
       {/* RECENT BOOKINGS + UPCOMING TRIPS */}
-      <section className="grid gap-4 lg:grid-cols-3">
+      <section className="grid gap-3 lg:grid-cols-3">
+
         <Card className="lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <div>

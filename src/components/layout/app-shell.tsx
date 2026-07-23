@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "framer-motion";
+
 import {
   LayoutDashboard,
   Ticket,
@@ -168,18 +168,10 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Main content — fills remaining space */}
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar onMenu={() => setMobileOpen(true)} />
-        <AnimatePresence mode="wait">
-          <motion.main 
-            key={location.pathname}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="flex-1 p-4 lg:p-8"
-          >
-            <div className="mx-auto max-w-7xl">{children}</div>
-          </motion.main>
-        </AnimatePresence>
+        <main className="flex-1 p-4 lg:p-6">
+          <div className="mx-auto max-w-7xl">{children}</div>
+        </main>
+
       </div>
     </div>
   );
