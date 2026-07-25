@@ -238,12 +238,14 @@ function POSPage() {
   const checkoutMutation = useMutation({
     mutationFn: async () => {
       if (!agencyId) throw new Error("لم يتم تحديد الوكالة");
+      if (!activeBranchId) throw new Error("لم يتم تحديد الفرع");
       if (cart.length === 0) throw new Error("السلة فارغة");
 
       const perTicketDiscount = cart.length > 0 ? Math.floor(discount / cart.length) : 0;
 
       const bookings = cart.map((c) => ({
         agency_id: agencyId,
+        branch_id: activeBranchId,
         trip_id: c.trip.id,
         passenger_name: c.passenger,
         passenger_phone: c.phone || null,

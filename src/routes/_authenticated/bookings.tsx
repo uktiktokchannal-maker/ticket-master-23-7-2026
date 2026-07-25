@@ -159,8 +159,10 @@ function BookingsPage() {
         if (error) throw error;
       } else {
         if (!agencyId) throw new Error("لم يتم تحديد الوكالة");
+        if (!activeBranchId) throw new Error("لم يتم تحديد الفرع");
         const { error } = await supabase.from("bookings").insert({
           agency_id: agencyId,
+          branch_id: activeBranchId,
           passenger_name: form.passenger_name,
           passenger_phone: form.passenger_phone,
           trip_id: form.trip_id,
