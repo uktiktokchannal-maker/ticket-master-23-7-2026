@@ -8,6 +8,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAgencyId } from "@/hooks/use-agency-id";
+import { useActiveBranch } from "@/hooks/use-active-branch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -73,6 +74,7 @@ const STATUS_TONE: Record<BookingStatus, string> = {
 function BookingsPage() {
   const qc = useQueryClient();
   const { data: agencyId } = useAgencyId();
+  const { activeBranchId } = useActiveBranch();
   const [editing, setEditing] = useState<Booking | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<Booking | null>(null);
@@ -157,8 +159,10 @@ function BookingsPage() {
         if (error) throw error;
       } else {
         if (!agencyId) throw new Error("لم يتم تحديد الوكالة");
+        if (!activeBranchId) throw new Error("لم يتم تحديد الفرع");
         const { error } = await supabase.from("bookings").insert({
           agency_id: agencyId,
+          branch_id: activeBranchId,
           passenger_name: form.passenger_name,
           passenger_phone: form.passenger_phone,
           trip_id: form.trip_id,

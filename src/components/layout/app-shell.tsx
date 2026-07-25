@@ -21,11 +21,13 @@ import {
   X,
   Search,
   Clock,
+  Building2,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { BranchSwitcher } from "@/components/layout/branch-switcher";
 import logo from "@/assets/logo-full.png.asset.json";
 
 type NavGroup = {
@@ -67,6 +69,7 @@ const NAV: NavGroup[] = [
   {
     label: "النظام",
     items: [
+      { to: "/branches", label: "الفروع", icon: Building2 },
       { to: "/notifications", label: "التنبيهات", icon: Bell },
       { to: "/settings", label: "إعدادات الوكالة", icon: Settings },
     ],
@@ -235,6 +238,7 @@ function TopBar({ onMenu }: { onMenu: () => void }) {
       </div>
 
       <div className="ms-auto flex items-center gap-2">
+        <BranchSwitcher />
         <Link
           to="/notifications"
           className="relative rounded-lg border border-border p-2 text-muted-foreground hover:bg-muted transition"

@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAgencyId } from "@/hooks/use-agency-id";
+import { useActiveBranch } from "@/hooks/use-active-branch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,6 +51,7 @@ type Shift = {
 function ShiftsPage() {
   const qc = useQueryClient();
   const { data: agencyId } = useAgencyId();
+  const { activeBranchId } = useActiveBranch();
   const [openDialogOpen, setOpenDialogOpen] = useState(false);
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [openingBalance, setOpeningBalance] = useState("0");
@@ -138,11 +140,13 @@ function ShiftsPage() {
   const openShift = useMutation({
     mutationFn: async () => {
       if (!agencyId || !currentUser?.id) throw new Error("لم يتم تحديد الوكالة أو المستخدم");
+      if (!activeBranchId) throw new Error("لم يتم تحديد الفرع");
       const balance = Number(openingBalance) || 0;
       if (balance < 0) throw new Error("المبلغ الافتتاحي لا يمكن أن يكون سالباً");
 
       const { error } = await supabase.from("cashier_shifts").insert({
         agency_id: agencyId,
+        branch_id: activeBranchId,
         cashier_id: currentUser.id,
         opening_balance: balance,
         expected_cash: balance,

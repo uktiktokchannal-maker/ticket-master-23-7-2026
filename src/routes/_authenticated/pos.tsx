@@ -7,6 +7,7 @@ import { CardGridSkeleton } from "@/components/ui/skeletons";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAgencyId } from "@/hooks/use-agency-id";
+import { useActiveBranch } from "@/hooks/use-active-branch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,6 +56,7 @@ type PayMethod = "cash" | "card" | "mobile";
 function POSPage() {
   const qc = useQueryClient();
   const { data: agencyId } = useAgencyId();
+  const { activeBranchId } = useActiveBranch();
   const [search, setSearch] = useState("");
   const [selectedTrip, setSelectedTrip] = useState<TripOption | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -236,12 +238,14 @@ function POSPage() {
   const checkoutMutation = useMutation({
     mutationFn: async () => {
       if (!agencyId) throw new Error("لم يتم تحديد الوكالة");
+      if (!activeBranchId) throw new Error("لم يتم تحديد الفرع");
       if (cart.length === 0) throw new Error("السلة فارغة");
 
       const perTicketDiscount = cart.length > 0 ? Math.floor(discount / cart.length) : 0;
 
       const bookings = cart.map((c) => ({
         agency_id: agencyId,
+        branch_id: activeBranchId,
         trip_id: c.trip.id,
         passenger_name: c.passenger,
         passenger_phone: c.phone || null,
