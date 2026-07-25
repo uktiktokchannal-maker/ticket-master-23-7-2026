@@ -56,6 +56,7 @@ type PayMethod = "cash" | "card" | "mobile";
 function POSPage() {
   const qc = useQueryClient();
   const { data: agencyId } = useAgencyId();
+  const { activeBranchId } = useActiveBranch();
   const [search, setSearch] = useState("");
   const [selectedTrip, setSelectedTrip] = useState<TripOption | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);

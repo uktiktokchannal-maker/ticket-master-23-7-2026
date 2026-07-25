@@ -74,6 +74,7 @@ const STATUS_TONE: Record<BookingStatus, string> = {
 function BookingsPage() {
   const qc = useQueryClient();
   const { data: agencyId } = useAgencyId();
+  const { activeBranchId } = useActiveBranch();
   const [editing, setEditing] = useState<Booking | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<Booking | null>(null);

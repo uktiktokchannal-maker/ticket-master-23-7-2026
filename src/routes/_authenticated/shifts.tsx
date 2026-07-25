@@ -51,6 +51,7 @@ type Shift = {
 function ShiftsPage() {
   const qc = useQueryClient();
   const { data: agencyId } = useAgencyId();
+  const { activeBranchId } = useActiveBranch();
   const [openDialogOpen, setOpenDialogOpen] = useState(false);
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [openingBalance, setOpeningBalance] = useState("0");
