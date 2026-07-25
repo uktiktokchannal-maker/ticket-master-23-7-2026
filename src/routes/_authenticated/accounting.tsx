@@ -62,6 +62,7 @@ function formatDate(d: Date): string {
 function AccountingPage() {
   const qc = useQueryClient();
   const { data: agencyId } = useAgencyId();
+  const { activeBranchId } = useActiveBranch();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Expense | null>(null);
 
