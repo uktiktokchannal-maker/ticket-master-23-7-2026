@@ -2,6 +2,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { Printer, User, Bus, Armchair, CalendarDays, Clock, Ticket as TicketIcon, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo-full.png.asset.json";
+import busImg from "@/assets/bus-white.png.asset.json";
 
 export type TicketData = {
   id: string;
@@ -28,38 +29,39 @@ function formatTime(iso: string | null, offsetMinutes = 0) {
   return d.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" });
 }
 
-/** Print-ready ticket matching the tickety mockup. Only variables change. */
+/**
+ * Landscape print-ready ticket matching the tickety mockup.
+ * Aspect ratio ~ A5 landscape (210x148). Only variables (data) change.
+ */
 export function TicketCard({ t }: { t: TicketData }) {
   const ticketNo = t.id.split("-")[0].toUpperCase();
   return (
     <div
       dir="rtl"
-      className="ticket-printable relative mx-auto w-full max-w-[880px] overflow-hidden rounded-[28px] bg-white text-[#062E5B] shadow-[0_20px_60px_-20px_rgba(6,46,91,0.35)]"
-      style={{ fontFamily: "Cairo, sans-serif" }}
+      className="ticket-printable relative mx-auto w-full max-w-[1100px] overflow-hidden rounded-[28px] bg-white text-[#062E5B] shadow-[0_20px_60px_-20px_rgba(6,46,91,0.35)]"
+      style={{ fontFamily: "Cairo, sans-serif", aspectRatio: "210 / 148" }}
     >
       {/* Header band */}
-      <div className="flex items-center justify-between border-b-4 border-[#008FC7] bg-white px-6 py-3">
-        <img src={logo.url} alt="TICKETTY" className="h-12 w-auto object-contain" />
-        <p className="text-center font-bold text-[#062E5B] text-base sm:text-lg">
+      <div className="flex items-center justify-between border-b-[3px] border-[#008FC7] bg-white px-6 py-3">
+        <img src={logo.url} alt="TICKETTY" className="h-14 w-auto object-contain" />
+        <p className="text-center font-extrabold text-[#062E5B] text-lg sm:text-xl">
           تطبيق حجز تذاكر البصات السفرية
         </p>
-        <div className="flex items-center gap-2 opacity-70">
-          <div className="h-9 w-9 rounded-full bg-[#062E5B]/10" />
-        </div>
+        <div className="h-10 w-10 rounded-full bg-[#062E5B]/10" />
       </div>
 
-      {/* Body */}
-      <div className="grid grid-cols-1 gap-4 bg-[#062E5B] p-5 sm:grid-cols-[1.15fr_1fr]">
+      {/* Body — blue background, two panels */}
+      <div className="grid h-[calc(100%-120px)] grid-cols-[1.15fr_1fr] gap-4 bg-[#062E5B] p-5">
         {/* LEFT — Data card */}
-        <div className="relative rounded-2xl bg-white p-5 shadow-inner">
-          {/* orange arrow accents (decorative) */}
-          <div className="pointer-events-none absolute -start-2 top-1/2 -translate-y-1/2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#FF8500] bg-white text-[#FF8500]">
+        <div className="relative rounded-2xl bg-white p-4 shadow-inner">
+          {/* perforation dot */}
+          <div className="pointer-events-none absolute -start-3 top-1/2 -translate-y-1/2 z-10">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#FF8500] bg-white text-[#FF8500] shadow">
               <ChevronsUpDown className="h-4 w-4" />
             </div>
           </div>
 
-          <ul className="space-y-2.5">
+          <ul className="flex h-full flex-col justify-between gap-2">
             <Row icon={<User className="h-4 w-4" />} label="اسم الراكب" value={t.passenger_name} />
             <Row icon={<Bus className="h-4 w-4" />} label="اسم الباص" value={t.bus_name} />
             <Row
@@ -91,14 +93,14 @@ export function TicketCard({ t }: { t: TicketData }) {
           </ul>
         </div>
 
-        {/* RIGHT — instructions + QR + confirmation */}
-        <div className="relative rounded-2xl bg-white p-5">
-          <p className="mb-2 font-extrabold text-[#062E5B]">التعليمات الهامة:</p>
-          <ul className="space-y-1.5 text-[12px] leading-relaxed text-[#062E5B]/90">
+        {/* RIGHT — instructions + QR + confirmation + bus */}
+        <div className="relative flex flex-col rounded-2xl bg-white p-4">
+          <p className="mb-2 font-extrabold text-[#062E5B] text-base">التعليمات الهامة:</p>
+          <ul className="flex-1 space-y-1 text-[11.5px] leading-relaxed text-[#062E5B]/90">
             {[
               "شنطة واحدة فقط لكل تذكرة.",
               "على الراكب ملء بيانات التذكرة قبل المغادرة من المكتب.",
-              "للسائق الحق في تغيير مسار الرحلة إذا دعت الضرورة.",
+              "للسائق الحق في تغيير مسار الرحلة إذا دعت الضرورة وحسب الظروف.",
               "الناقل غير مسؤول عن الأشياء الثمينة كالذهب والمجوهرات والأوراق النقدية.",
               "لا ترد قيمة التذكرة بعد صرفها.",
               "يسمح لكل راكب نقل حقيبة واحدة لا تتعدى 20 كجم.",
@@ -112,29 +114,31 @@ export function TicketCard({ t }: { t: TicketData }) {
             ))}
           </ul>
 
-          <div className="mt-4 flex items-end justify-between gap-3">
+          <div className="mt-3 flex items-end justify-between gap-3">
             <div className="rounded-lg border border-dashed border-[#062E5B]/30 bg-white p-1.5">
               <QRCodeSVG value={`TICKET:${t.id}`} size={78} level="M" fgColor="#062E5B" />
             </div>
-            <div className="text-center">
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-[#E6F4FA] px-4 py-1.5">
+            <div className="flex flex-col items-center">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-[#E6F4FA] px-5 py-1.5 shadow-sm">
                 <span className="h-2 w-2 rounded-full bg-[#16B364]" />
                 <span className="text-sm font-extrabold text-[#062E5B]">مؤكد</span>
               </div>
-              <p className="mt-2 text-[11px] font-bold text-[#062E5B]/70">
-                المسار: {t.route ?? "—"}
-              </p>
-              <p className="text-[11px] font-bold text-[#062E5B]/70">
-                السعر: {t.amount.toLocaleString("ar-EG")} {t.currency ?? ""}
+              <p className="mt-1 text-[10px] font-bold text-[#062E5B]/70">
+                {t.route ?? "—"} · {t.amount.toLocaleString("ar-EG")} {t.currency ?? ""}
               </p>
             </div>
+            <img
+              src={busImg.url}
+              alt=""
+              className="h-16 w-auto object-contain opacity-95"
+            />
           </div>
         </div>
       </div>
 
       {/* Footer */}
       <div className="bg-white py-3 text-center">
-        <p className="font-extrabold text-[#062E5B] text-base">
+        <p className="font-extrabold text-[#062E5B] text-lg">
           دقة في المواعيد — <span className="text-[#FF8500]">راحة في الطريق</span>
         </p>
       </div>
@@ -154,13 +158,13 @@ function Row({
   highlight?: boolean;
 }) {
   return (
-    <li className="flex items-center gap-3 rounded-xl border border-[#062E5B]/10 bg-[#F5F8FC] px-3 py-2">
+    <li className="flex items-center gap-3 rounded-xl border border-[#062E5B]/10 bg-[#F5F8FC] px-3 py-1.5">
       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#008FC7]/10 text-[#008FC7]">
         {icon}
       </span>
       <span className="text-sm font-bold text-[#062E5B]/80">{label}:</span>
       <span
-        className={`ms-auto tabular font-extrabold ${highlight ? "text-[#FF8500] text-2xl" : "text-[#062E5B] text-base"}`}
+        className={`ms-auto tabular font-extrabold ${highlight ? "text-[#FF8500] text-3xl leading-none" : "text-[#062E5B] text-base"}`}
         style={{ fontVariantNumeric: "tabular-nums" }}
       >
         {value}
@@ -181,7 +185,7 @@ export function TicketPrintView({
     <div className="space-y-4">
       <div className="no-print flex items-center justify-between gap-2">
         <p className="text-sm font-bold text-foreground">
-          تم إصدار {tickets.length} تذكرة — جاهزة للطباعة
+          تم إصدار {tickets.length} تذكرة — جاهزة للطباعة (أفقي)
         </p>
         <div className="flex gap-2">
           {onClose && (
@@ -203,7 +207,6 @@ export function TicketPrintView({
             <Printer className="me-2 h-4 w-4" />
             طباعة
           </Button>
-
         </div>
       </div>
       <div className="tickets-print-area space-y-6">
