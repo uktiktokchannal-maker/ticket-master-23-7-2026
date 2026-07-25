@@ -5,6 +5,7 @@ import { Wallet, TrendingUp, TrendingDown, Plus, Loader2, Calendar, Receipt, Bus
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAgencyId } from "@/hooks/use-agency-id";
+import { useActiveBranch } from "@/hooks/use-active-branch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -174,8 +175,10 @@ function AccountingPage() {
       if (!amount || Number(amount) <= 0) throw new Error("يرجى إدخال مبلغ صحيح");
       if (!desc.trim()) throw new Error("يرجى كتابة البيان");
 
+      if (!activeBranchId) throw new Error("لم يتم تحديد الفرع");
       const payload = {
         agency_id: agencyId,
+        branch_id: activeBranchId,
         category,
         amount: Number(amount),
         description: desc.trim(),
