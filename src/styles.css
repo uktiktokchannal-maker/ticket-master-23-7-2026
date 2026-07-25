@@ -379,7 +379,14 @@
     margin: 2mm 0;
   }
 
-  /* === Tickety printable ticket === */
+  /* === Tickety printable ticket (landscape) === */
+  @page ticket {
+    size: A5 landscape;
+    margin: 6mm;
+  }
+  body.tickets-print-mode {
+    background: white !important;
+  }
   body.tickets-print-mode * {
     visibility: hidden !important;
   }
@@ -391,17 +398,20 @@
     position: fixed !important;
     inset: 0 !important;
     margin: 0 !important;
-    padding: 6mm !important;
+    padding: 0 !important;
     background: white !important;
     z-index: 99999 !important;
     overflow: visible !important;
   }
   body.tickets-print-mode .ticket-printable {
+    page: ticket;
     page-break-after: always;
     box-shadow: none !important;
+    width: 100% !important;
     max-width: 100% !important;
     break-inside: avoid;
   }
+
 }
 
 @media print {
