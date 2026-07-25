@@ -54,6 +54,7 @@ export type Database = {
         Row: {
           agency_id: string
           amount: number
+          branch_id: string
           created_at: string
           created_by: string | null
           id: string
@@ -67,6 +68,7 @@ export type Database = {
         Insert: {
           agency_id: string
           amount?: number
+          branch_id: string
           created_at?: string
           created_by?: string | null
           id?: string
@@ -80,6 +82,7 @@ export type Database = {
         Update: {
           agency_id?: string
           amount?: number
+          branch_id?: string
           created_at?: string
           created_by?: string | null
           id?: string
@@ -99,10 +102,61 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "bookings_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "bookings_trip_id_fkey"
             columns: ["trip_id"]
             isOneToOne: false
             referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      branches: {
+        Row: {
+          address: string | null
+          agency_id: string
+          created_at: string
+          id: string
+          is_main: boolean
+          name: string
+          phone: string | null
+          state: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          agency_id: string
+          created_at?: string
+          id?: string
+          is_main?: boolean
+          name: string
+          phone?: string | null
+          state?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          agency_id?: string
+          created_at?: string
+          id?: string
+          is_main?: boolean
+          name?: string
+          phone?: string | null
+          state?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "branches_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
             referencedColumns: ["id"]
           },
         ]
@@ -152,6 +206,7 @@ export type Database = {
         Row: {
           actual_cash: number | null
           agency_id: string
+          branch_id: string
           cashier_id: string
           closed_at: string | null
           created_at: string
@@ -167,6 +222,7 @@ export type Database = {
         Insert: {
           actual_cash?: number | null
           agency_id: string
+          branch_id: string
           cashier_id: string
           closed_at?: string | null
           created_at?: string
@@ -182,6 +238,7 @@ export type Database = {
         Update: {
           actual_cash?: number | null
           agency_id?: string
+          branch_id?: string
           cashier_id?: string
           closed_at?: string | null
           created_at?: string
@@ -200,6 +257,13 @@ export type Database = {
             columns: ["agency_id"]
             isOneToOne: false
             referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cashier_shifts_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
             referencedColumns: ["id"]
           },
         ]
@@ -249,6 +313,7 @@ export type Database = {
         Row: {
           agency_id: string
           amount: number
+          branch_id: string
           bus_id: string | null
           category: Database["public"]["Enums"]["expense_category"]
           created_at: string
@@ -260,6 +325,7 @@ export type Database = {
         Insert: {
           agency_id: string
           amount?: number
+          branch_id: string
           bus_id?: string | null
           category?: Database["public"]["Enums"]["expense_category"]
           created_at?: string
@@ -271,6 +337,7 @@ export type Database = {
         Update: {
           agency_id?: string
           amount?: number
+          branch_id?: string
           bus_id?: string | null
           category?: Database["public"]["Enums"]["expense_category"]
           created_at?: string
@@ -288,6 +355,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "expenses_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "expenses_bus_id_fkey"
             columns: ["bus_id"]
             isOneToOne: false
@@ -299,6 +373,7 @@ export type Database = {
       notifications: {
         Row: {
           agency_id: string
+          branch_id: string | null
           created_at: string
           description: string | null
           id: string
@@ -308,6 +383,7 @@ export type Database = {
         }
         Insert: {
           agency_id: string
+          branch_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -317,6 +393,7 @@ export type Database = {
         }
         Update: {
           agency_id?: string
+          branch_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -332,11 +409,19 @@ export type Database = {
             referencedRelation: "agencies"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "notifications_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles: {
         Row: {
           agency_id: string | null
+          branch_id: string | null
           created_at: string
           full_name: string | null
           id: string
@@ -345,6 +430,7 @@ export type Database = {
         }
         Insert: {
           agency_id?: string | null
+          branch_id?: string | null
           created_at?: string
           full_name?: string | null
           id: string
@@ -353,6 +439,7 @@ export type Database = {
         }
         Update: {
           agency_id?: string | null
+          branch_id?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
@@ -365,6 +452,13 @@ export type Database = {
             columns: ["agency_id"]
             isOneToOne: false
             referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
             referencedColumns: ["id"]
           },
         ]
@@ -481,6 +575,7 @@ export type Database = {
       user_roles: {
         Row: {
           agency_id: string | null
+          branch_id: string | null
           created_at: string
           id: string
           role: Database["public"]["Enums"]["app_role"]
@@ -488,6 +583,7 @@ export type Database = {
         }
         Insert: {
           agency_id?: string | null
+          branch_id?: string | null
           created_at?: string
           id?: string
           role: Database["public"]["Enums"]["app_role"]
@@ -495,6 +591,7 @@ export type Database = {
         }
         Update: {
           agency_id?: string | null
+          branch_id?: string | null
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
@@ -506,6 +603,13 @@ export type Database = {
             columns: ["agency_id"]
             isOneToOne: false
             referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_roles_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
             referencedColumns: ["id"]
           },
         ]
@@ -520,6 +624,7 @@ export type Database = {
         Returns: string
       }
       current_agency_id: { Args: never; Returns: string }
+      current_branch_id: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -527,6 +632,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      user_can_access_branch: { Args: { _branch_id: string }; Returns: boolean }
     }
     Enums: {
       app_role:
