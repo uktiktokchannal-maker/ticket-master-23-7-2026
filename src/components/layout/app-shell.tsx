@@ -89,9 +89,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const filteredNav = NAV
     .map((g) => ({
       ...g,
-      items: g.items.filter((it) => !allowed || allowed.has(it.to) || it.to === "/settings"),
+      items: g.items.filter((it) => !allowed || allowed.has(it.to)),
     }))
     .filter((g) => g.items.length > 0);
+
 
 
   return (
