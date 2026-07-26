@@ -257,17 +257,22 @@ async function loadDashboard(branchId: string | null): Promise<DashboardData> {
 }
 
 function DashboardPage() {
+  const { activeBranch, activeBranchId, canSwitch } = useActiveBranch();
+  const [scope, setScope] = useState<"branch" | "all">("branch");
+  const effectiveBranchId = scope === "all" && canSwitch ? null : activeBranchId;
+
   const { data, isLoading, error } = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: loadDashboard,
+    queryKey: ["dashboard", effectiveBranchId ?? "all"],
+    queryFn: () => loadDashboard(effectiveBranchId),
     refetchInterval: 60_000,
+    enabled: canSwitch ? true : !!activeBranchId,
   });
 
-  if (isLoading) {
+  if (isLoading || !data) {
     return <DashboardSkeleton />;
   }
 
-  if (error || !data) {
+  if (error) {
     return (
       <div className="rounded-2xl border border-destructive/40 bg-destructive/5 p-6 text-sm text-destructive">
         تعذّر تحميل بيانات اللوحة. حاول التحديث.
@@ -292,6 +297,8 @@ function DashboardPage() {
   const revenueDelta = pctDelta(todayRevenue, yesterdayRevenue);
   const bookingsDelta = pctDelta(todayBookings, yesterdayBookings);
   const currency = profile.agency_currency;
+  const scopeLabel = effectiveBranchId ? (activeBranch?.name ?? "الفرع الحالي") : "كل الفروع";
+
 
   return (
     <div className="mx-auto max-w-7xl space-y-4">
