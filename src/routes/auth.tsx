@@ -24,7 +24,7 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
 
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [agencyName, setAgencyName] = useState("");
@@ -36,13 +36,19 @@ function AuthPage() {
     });
   }, [navigate]);
 
+  function resolveEmail(input: string): string {
+    const v = input.trim();
+    if (v.includes("@")) return v;
+    return `${v.toLowerCase()}@users.ticketty.local`;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
-          email,
+          email: identifier.trim(),
           password,
           options: {
             emailRedirectTo: window.location.origin,
@@ -53,7 +59,10 @@ function AuthPage() {
         toast.success("تم إنشاء حسابك بنجاح");
         navigate({ to: "/dashboard", replace: true });
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({
+          email: resolveEmail(identifier),
+          password,
+        });
         if (error) throw error;
         toast.success("مرحباً بعودتك");
         navigate({ to: "/dashboard", replace: true });
@@ -69,6 +78,7 @@ function AuthPage() {
       setLoading(false);
     }
   }
+
 
   if (checkingSession) {
     return (
