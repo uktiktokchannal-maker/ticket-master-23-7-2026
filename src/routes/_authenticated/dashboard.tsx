@@ -1,10 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  TrendingUp,
-  TrendingDown,
   Ticket,
   BusFront,
   Wallet,
@@ -17,21 +15,20 @@ import {
   MapPin,
   Gauge,
   CalendarClock,
+  Building2,
+  Globe2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardSkeleton } from "@/components/ui/skeletons";
-import heroIllustration from "@/assets/hero-illustration.png.asset.json";
+import { useActiveBranch } from "@/hooks/use-active-branch";
 import {
   BusStatus,
   BookingStatus,
-  Tone,
-  toneMap,
   Card,
   QuickAction,
   DeltaPill,
   FleetRow,
   KpiCard,
-  Sparkline,
   RevenueChart,
   FleetDonut,
   StatusBadge,
@@ -41,6 +38,7 @@ import {
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
+
 
 type DashboardData = {
   profile: { full_name: string | null; agency_name: string | null; agency_currency: string };
