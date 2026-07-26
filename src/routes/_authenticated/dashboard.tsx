@@ -203,8 +203,8 @@ async function loadDashboard(branchId: string | null): Promise<DashboardData> {
     const bus = Array.isArray(t.buses) ? t.buses[0] : t.buses;
     const cap = Number((bus as { seat_count?: number } | null)?.seat_count ?? 0);
     seatsCapacity += cap;
-    const bks = (t.bookings ?? []) as Array<{ status: string }>;
-    seatsBooked += bks.filter((x) => x.status === "confirmed").length;
+    const bks = (t.bookings ?? []) as Array<{ status: string; branch_id?: string | null }>;
+    seatsBooked += bks.filter((x) => x.status === "confirmed" && (!branchId || x.branch_id === branchId)).length;
   }
   const occupancyPct = seatsCapacity > 0 ? Math.round((seatsBooked / seatsCapacity) * 100) : 0;
 
@@ -226,15 +226,16 @@ async function loadDashboard(branchId: string | null): Promise<DashboardData> {
   const upcomingTrips = (upcomingTripsRes.data ?? []).map((t) => {
     const routeObj = Array.isArray(t.routes) ? t.routes[0] : t.routes;
     const busObj = Array.isArray(t.buses) ? t.buses[0] : t.buses;
-    const bks = (t.bookings ?? []) as Array<{ status: string }>;
+    const bks = (t.bookings ?? []) as Array<{ status: string; branch_id?: string | null }>;
     return {
       id: t.id as string,
       departure_at: t.departure_at as string,
       route: routeObj ? `${routeObj.origin} → ${routeObj.destination}` : null,
-      booked: bks.filter((x) => x.status === "confirmed").length,
+      booked: bks.filter((x) => x.status === "confirmed" && (!branchId || x.branch_id === branchId)).length,
       capacity: Number((busObj as { seat_count?: number } | null)?.seat_count ?? 0),
     };
   });
+
 
   return {
     profile: {
