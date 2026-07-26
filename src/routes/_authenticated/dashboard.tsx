@@ -327,7 +327,32 @@ function DashboardPage() {
                   month: "long",
                 })}
               </span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-bold">
+                {effectiveBranchId ? <Building2 className="h-3 w-3" /> : <Globe2 className="h-3 w-3" />}
+                {scopeLabel}
+              </span>
             </div>
+            {canSwitch && (
+              <div className="mt-2 inline-flex rounded-full bg-white/10 p-0.5 text-[11px] font-bold">
+                <button
+                  type="button"
+                  onClick={() => setScope("branch")}
+                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 transition ${scope === "branch" ? "bg-white text-primary" : "text-primary-foreground/80"}`}
+                >
+                  <Building2 className="h-3 w-3" />
+                  الفرع الحالي
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setScope("all")}
+                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 transition ${scope === "all" ? "bg-white text-primary" : "text-primary-foreground/80"}`}
+                >
+                  <Globe2 className="h-3 w-3" />
+                  كل الفروع
+                </button>
+              </div>
+            )}
+
 
             <div className="mt-3 flex flex-wrap items-end gap-x-4 gap-y-2">
               <div className="min-w-0">
