@@ -24,7 +24,7 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
 
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [agencyName, setAgencyName] = useState("");
@@ -36,13 +36,19 @@ function AuthPage() {
     });
   }, [navigate]);
 
+  function resolveEmail(input: string): string {
+    const v = input.trim();
+    if (v.includes("@")) return v;
+    return `${v.toLowerCase()}@users.ticketty.local`;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
-          email,
+          email: identifier.trim(),
           password,
           options: {
             emailRedirectTo: window.location.origin,
@@ -53,7 +59,10 @@ function AuthPage() {
         toast.success("تم إنشاء حسابك بنجاح");
         navigate({ to: "/dashboard", replace: true });
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({
+          email: resolveEmail(identifier),
+          password,
+        });
         if (error) throw error;
         toast.success("مرحباً بعودتك");
         navigate({ to: "/dashboard", replace: true });
@@ -69,6 +78,7 @@ function AuthPage() {
       setLoading(false);
     }
   }
+
 
   if (checkingSession) {
     return (
@@ -168,18 +178,22 @@ function AuthPage() {
               </>
             )}
 
-            <Field label="البريد الإلكتروني" htmlFor="email">
+            <Field
+              label={mode === "signup" ? "البريد الإلكتروني" : "البريد الإلكتروني أو اسم المستخدم"}
+              htmlFor="identifier"
+            >
               <input
-                id="email"
-                type="email"
+                id="identifier"
+                type={mode === "signup" ? "email" : "text"}
                 required
                 dir="ltr"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@agency.com"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder={mode === "signup" ? "you@agency.com" : "username أو you@agency.com"}
                 className={`${inputClass} text-start`}
               />
             </Field>
+
 
             <Field label="كلمة المرور" htmlFor="password">
               <input

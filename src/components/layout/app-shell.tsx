@@ -28,6 +28,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { BranchSwitcher } from "@/components/layout/branch-switcher";
+import { useAllowedPaths } from "@/hooks/use-my-roles";
+
 import logo from "@/assets/logo-full.png.asset.json";
 
 type NavGroup = {
@@ -79,11 +81,21 @@ const NAV: NavGroup[] = [
 export function AppShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const { allowed } = useAllowedPaths();
 
   // Close mobile drawer on route change
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
+
+  const filteredNav = NAV
+    .map((g) => ({
+      ...g,
+      items: g.items.filter((it) => !allowed || allowed.has(it.to)),
+    }))
+    .filter((g) => g.items.length > 0);
+
+
 
   return (
     <div className="flex min-h-dvh bg-background text-foreground">
@@ -125,7 +137,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
 
         <nav className="flex flex-col gap-6 overflow-y-auto p-3" style={{ height: "calc(100dvh - 4rem)" }}>
-          {NAV.map((group) => (
+          {filteredNav.map((group) => (
             <div key={group.label}>
               <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                 {group.label}
