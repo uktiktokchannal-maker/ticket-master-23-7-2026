@@ -118,10 +118,9 @@ async function loadDashboard(branchId: string | null): Promise<DashboardData> {
     upcomingTripsRes,
     todayTripsCapacityRes,
   ] = await Promise.all([
-    supabase
-      .from("bookings")
-      .select("amount, status, created_at")
-      .gte("created_at", weekStart),
+    (branchId
+      ? supabase.from("bookings").select("amount, status, created_at").gte("created_at", weekStart).eq("branch_id", branchId)
+      : supabase.from("bookings").select("amount, status, created_at").gte("created_at", weekStart)),
     supabase
       .from("trips")
       .select("id, status, departure_at")
@@ -129,14 +128,12 @@ async function loadDashboard(branchId: string | null): Promise<DashboardData> {
       .lte("departure_at", dayEnd)
       .in("status", ["scheduled", "boarding", "departed"]),
     supabase.from("buses").select("status"),
-    supabase
-      .from("bookings")
-      .select("id, passenger_name, seat_number, amount, status, created_at, trips(routes(origin, destination))")
-      .order("created_at", { ascending: false })
-      .limit(8),
+    (branchId
+      ? supabase.from("bookings").select("id, passenger_name, seat_number, amount, status, created_at, trips(routes(origin, destination))").order("created_at", { ascending: false }).limit(8).eq("branch_id", branchId)
+      : supabase.from("bookings").select("id, passenger_name, seat_number, amount, status, created_at, trips(routes(origin, destination))").order("created_at", { ascending: false }).limit(8)),
     supabase
       .from("trips")
-      .select("id, departure_at, buses(seat_count), routes(origin, destination), bookings(id, status)")
+      .select("id, departure_at, buses(seat_count), routes(origin, destination), bookings(id, status, branch_id)")
       .gte("departure_at", nowIso)
       .lte("departure_at", in48h)
       .in("status", ["scheduled", "boarding"])
@@ -144,10 +141,11 @@ async function loadDashboard(branchId: string | null): Promise<DashboardData> {
       .limit(5),
     supabase
       .from("trips")
-      .select("buses(seat_count), bookings(id, status)")
+      .select("buses(seat_count), bookings(id, status, branch_id)")
       .gte("departure_at", dayStart)
       .lte("departure_at", dayEnd),
   ]);
+
 
   const weekBookings = weekBookingsRes.data ?? [];
   const todayTs = new Date(dayStart).getTime();
