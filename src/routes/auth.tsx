@@ -178,18 +178,22 @@ function AuthPage() {
               </>
             )}
 
-            <Field label="البريد الإلكتروني" htmlFor="email">
+            <Field
+              label={mode === "signup" ? "البريد الإلكتروني" : "البريد الإلكتروني أو اسم المستخدم"}
+              htmlFor="identifier"
+            >
               <input
-                id="email"
-                type="email"
+                id="identifier"
+                type={mode === "signup" ? "email" : "text"}
                 required
                 dir="ltr"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@agency.com"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder={mode === "signup" ? "you@agency.com" : "username أو you@agency.com"}
                 className={`${inputClass} text-start`}
               />
             </Field>
+
 
             <Field label="كلمة المرور" htmlFor="password">
               <input
