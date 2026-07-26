@@ -1,10 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  TrendingUp,
-  TrendingDown,
   Ticket,
   BusFront,
   Wallet,
@@ -17,21 +15,20 @@ import {
   MapPin,
   Gauge,
   CalendarClock,
+  Building2,
+  Globe2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardSkeleton } from "@/components/ui/skeletons";
-import heroIllustration from "@/assets/hero-illustration.png.asset.json";
+import { useActiveBranch } from "@/hooks/use-active-branch";
 import {
   BusStatus,
   BookingStatus,
-  Tone,
-  toneMap,
   Card,
   QuickAction,
   DeltaPill,
   FleetRow,
   KpiCard,
-  Sparkline,
   RevenueChart,
   FleetDonut,
   StatusBadge,
@@ -41,6 +38,7 @@ import {
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
+
 
 type DashboardData = {
   profile: { full_name: string | null; agency_name: string | null; agency_currency: string };
@@ -87,7 +85,7 @@ function daysAgoStart(n: number) {
   return d;
 }
 
-async function loadDashboard(): Promise<DashboardData> {
+async function loadDashboard(branchId: string | null): Promise<DashboardData> {
   const { data: userRes } = await supabase.auth.getUser();
   if (!userRes.user) throw new Error("Not authenticated");
 
@@ -120,10 +118,9 @@ async function loadDashboard(): Promise<DashboardData> {
     upcomingTripsRes,
     todayTripsCapacityRes,
   ] = await Promise.all([
-    supabase
-      .from("bookings")
-      .select("amount, status, created_at")
-      .gte("created_at", weekStart),
+    (branchId
+      ? supabase.from("bookings").select("amount, status, created_at").gte("created_at", weekStart).eq("branch_id", branchId)
+      : supabase.from("bookings").select("amount, status, created_at").gte("created_at", weekStart)),
     supabase
       .from("trips")
       .select("id, status, departure_at")
@@ -131,14 +128,12 @@ async function loadDashboard(): Promise<DashboardData> {
       .lte("departure_at", dayEnd)
       .in("status", ["scheduled", "boarding", "departed"]),
     supabase.from("buses").select("status"),
-    supabase
-      .from("bookings")
-      .select("id, passenger_name, seat_number, amount, status, created_at, trips(routes(origin, destination))")
-      .order("created_at", { ascending: false })
-      .limit(8),
+    (branchId
+      ? supabase.from("bookings").select("id, passenger_name, seat_number, amount, status, created_at, trips(routes(origin, destination))").order("created_at", { ascending: false }).limit(8).eq("branch_id", branchId)
+      : supabase.from("bookings").select("id, passenger_name, seat_number, amount, status, created_at, trips(routes(origin, destination))").order("created_at", { ascending: false }).limit(8)),
     supabase
       .from("trips")
-      .select("id, departure_at, buses(seat_count), routes(origin, destination), bookings(id, status)")
+      .select("id, departure_at, buses(seat_count), routes(origin, destination), bookings(id, status, branch_id)")
       .gte("departure_at", nowIso)
       .lte("departure_at", in48h)
       .in("status", ["scheduled", "boarding"])
@@ -146,10 +141,11 @@ async function loadDashboard(): Promise<DashboardData> {
       .limit(5),
     supabase
       .from("trips")
-      .select("buses(seat_count), bookings(id, status)")
+      .select("buses(seat_count), bookings(id, status, branch_id)")
       .gte("departure_at", dayStart)
       .lte("departure_at", dayEnd),
   ]);
+
 
   const weekBookings = weekBookingsRes.data ?? [];
   const todayTs = new Date(dayStart).getTime();
@@ -207,8 +203,8 @@ async function loadDashboard(): Promise<DashboardData> {
     const bus = Array.isArray(t.buses) ? t.buses[0] : t.buses;
     const cap = Number((bus as { seat_count?: number } | null)?.seat_count ?? 0);
     seatsCapacity += cap;
-    const bks = (t.bookings ?? []) as Array<{ status: string }>;
-    seatsBooked += bks.filter((x) => x.status === "confirmed").length;
+    const bks = (t.bookings ?? []) as Array<{ status: string; branch_id?: string | null }>;
+    seatsBooked += bks.filter((x) => x.status === "confirmed" && (!branchId || x.branch_id === branchId)).length;
   }
   const occupancyPct = seatsCapacity > 0 ? Math.round((seatsBooked / seatsCapacity) * 100) : 0;
 
@@ -230,15 +226,16 @@ async function loadDashboard(): Promise<DashboardData> {
   const upcomingTrips = (upcomingTripsRes.data ?? []).map((t) => {
     const routeObj = Array.isArray(t.routes) ? t.routes[0] : t.routes;
     const busObj = Array.isArray(t.buses) ? t.buses[0] : t.buses;
-    const bks = (t.bookings ?? []) as Array<{ status: string }>;
+    const bks = (t.bookings ?? []) as Array<{ status: string; branch_id?: string | null }>;
     return {
       id: t.id as string,
       departure_at: t.departure_at as string,
       route: routeObj ? `${routeObj.origin} → ${routeObj.destination}` : null,
-      booked: bks.filter((x) => x.status === "confirmed").length,
+      booked: bks.filter((x) => x.status === "confirmed" && (!branchId || x.branch_id === branchId)).length,
       capacity: Number((busObj as { seat_count?: number } | null)?.seat_count ?? 0),
     };
   });
+
 
   return {
     profile: {
@@ -260,17 +257,22 @@ async function loadDashboard(): Promise<DashboardData> {
 }
 
 function DashboardPage() {
+  const { activeBranch, activeBranchId, canSwitch } = useActiveBranch();
+  const [scope, setScope] = useState<"branch" | "all">("branch");
+  const effectiveBranchId = scope === "all" && canSwitch ? null : activeBranchId;
+
   const { data, isLoading, error } = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: loadDashboard,
+    queryKey: ["dashboard", effectiveBranchId ?? "all"],
+    queryFn: () => loadDashboard(effectiveBranchId),
     refetchInterval: 60_000,
+    enabled: canSwitch ? true : !!activeBranchId,
   });
 
-  if (isLoading) {
+  if (isLoading || !data) {
     return <DashboardSkeleton />;
   }
 
-  if (error || !data) {
+  if (error) {
     return (
       <div className="rounded-2xl border border-destructive/40 bg-destructive/5 p-6 text-sm text-destructive">
         تعذّر تحميل بيانات اللوحة. حاول التحديث.
@@ -295,6 +297,8 @@ function DashboardPage() {
   const revenueDelta = pctDelta(todayRevenue, yesterdayRevenue);
   const bookingsDelta = pctDelta(todayBookings, yesterdayBookings);
   const currency = profile.agency_currency;
+  const scopeLabel = effectiveBranchId ? (activeBranch?.name ?? "الفرع الحالي") : "كل الفروع";
+
 
   return (
     <div className="mx-auto max-w-7xl space-y-4">
@@ -323,7 +327,32 @@ function DashboardPage() {
                   month: "long",
                 })}
               </span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-bold">
+                {effectiveBranchId ? <Building2 className="h-3 w-3" /> : <Globe2 className="h-3 w-3" />}
+                {scopeLabel}
+              </span>
             </div>
+            {canSwitch && (
+              <div className="mt-2 inline-flex rounded-full bg-white/10 p-0.5 text-[11px] font-bold">
+                <button
+                  type="button"
+                  onClick={() => setScope("branch")}
+                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 transition ${scope === "branch" ? "bg-white text-primary" : "text-primary-foreground/80"}`}
+                >
+                  <Building2 className="h-3 w-3" />
+                  الفرع الحالي
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setScope("all")}
+                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 transition ${scope === "all" ? "bg-white text-primary" : "text-primary-foreground/80"}`}
+                >
+                  <Globe2 className="h-3 w-3" />
+                  كل الفروع
+                </button>
+              </div>
+            )}
+
 
             <div className="mt-3 flex flex-wrap items-end gap-x-4 gap-y-2">
               <div className="min-w-0">
