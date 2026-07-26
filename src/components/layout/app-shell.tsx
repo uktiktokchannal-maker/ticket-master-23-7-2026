@@ -28,6 +28,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { BranchSwitcher } from "@/components/layout/branch-switcher";
+import { useAllowedPaths } from "@/hooks/use-my-roles";
+
 import logo from "@/assets/logo-full.png.asset.json";
 
 type NavGroup = {
