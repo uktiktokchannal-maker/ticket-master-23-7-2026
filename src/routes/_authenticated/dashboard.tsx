@@ -85,7 +85,7 @@ function daysAgoStart(n: number) {
   return d;
 }
 
-async function loadDashboard(): Promise<DashboardData> {
+async function loadDashboard(branchId: string | null): Promise<DashboardData> {
   const { data: userRes } = await supabase.auth.getUser();
   if (!userRes.user) throw new Error("Not authenticated");
 
