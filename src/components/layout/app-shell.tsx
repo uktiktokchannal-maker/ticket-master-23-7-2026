@@ -137,7 +137,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
 
         <nav className="flex flex-col gap-6 overflow-y-auto p-3" style={{ height: "calc(100dvh - 4rem)" }}>
-          {NAV.map((group) => (
+          {filteredNav.map((group) => (
             <div key={group.label}>
               <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                 {group.label}
