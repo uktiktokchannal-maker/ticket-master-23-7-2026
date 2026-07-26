@@ -79,11 +79,20 @@ const NAV: NavGroup[] = [
 export function AppShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const { allowed } = useAllowedPaths();
 
   // Close mobile drawer on route change
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
+
+  const filteredNav = NAV
+    .map((g) => ({
+      ...g,
+      items: g.items.filter((it) => !allowed || allowed.has(it.to) || it.to === "/settings"),
+    }))
+    .filter((g) => g.items.length > 0);
+
 
   return (
     <div className="flex min-h-dvh bg-background text-foreground">
