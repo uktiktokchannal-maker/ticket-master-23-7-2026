@@ -585,10 +585,12 @@ function TripFormDialog({
               <SelectContent>
                 <SelectItem value="none">بدون سائق</SelectItem>
                 {drivers.map((d) => (
-                  <SelectItem key={d.id} value={d.id}>
+                  <SelectItem key={d.id} value={d.id} disabled={busyDriverIds.has(d.id)}>
                     {d.name}
+                    {busyDriverIds.has(d.id) ? " — مشغول" : ""}
                   </SelectItem>
                 ))}
+
               </SelectContent>
             </Select>
           </div>
