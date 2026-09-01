@@ -567,8 +567,9 @@ function TripFormDialog({
           </div>
           <div className="space-y-2">
             <Label htmlFor="dep">موعد الانطلاق *</Label>
-            <Input id="dep" type="datetime-local" value={departure} onChange={(e) => setDeparture(e.target.value)} />
+            <Input id="dep" type="datetime-local" value={departure} min={initial ? undefined : new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)} onChange={(e) => setDeparture(e.target.value)} />
           </div>
+
         </div>
         <div className="grid grid-cols-3 gap-3">
           <div className="space-y-2">
