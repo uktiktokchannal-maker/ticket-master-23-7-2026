@@ -261,9 +261,11 @@ function TripsPage() {
             routes={routesList ?? []}
             buses={busesList ?? []}
             drivers={driversList ?? []}
+            existingTrips={trips ?? []}
             onSubmit={(f) => upsertTrip.mutate(f)}
             submitting={upsertTrip.isPending}
           />
+
         </Dialog>
       </div>
 
