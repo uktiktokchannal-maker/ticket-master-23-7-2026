@@ -615,16 +615,30 @@ function BookingFormDialog({
           e.preventDefault();
           if (!name.trim()) return toast.error("اسم المسافر مطلوب");
           if (!tripId) return toast.error("اختر الرحلة");
+          const seatNum = Number(seat) || 0;
+          if (selectedTrip && (seatNum < 1 || seatNum > selectedTrip.capacity)) {
+            return toast.error(`رقم المقعد يجب أن يكون بين 1 و ${selectedTrip.capacity}`);
+          }
+          if (Number(amount) < 0) return toast.error("لا يمكن أن يكون المبلغ سالباً");
+          if (
+            !initial &&
+            status === "confirmed" &&
+            selectedTrip &&
+            new Date(selectedTrip.departure_at).getTime() < Date.now()
+          ) {
+            return toast.error("لا يمكن الحجز على رحلة انقضى موعد انطلاقها");
+          }
           onSubmit({
             id: initial?.id,
             passenger_name: name.trim(),
             passenger_phone: phone.trim() || null,
             trip_id: tripId,
-            seat_number: Number(seat) || 1,
+            seat_number: seatNum || 1,
             amount: Number(amount) || 0,
             status,
           });
         }}
+
       >
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
