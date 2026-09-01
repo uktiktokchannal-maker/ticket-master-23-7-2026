@@ -556,10 +556,12 @@ function TripFormDialog({
               </SelectTrigger>
               <SelectContent>
                 {buses.map((b) => (
-                  <SelectItem key={b.id} value={b.id}>
+                  <SelectItem key={b.id} value={b.id} disabled={busyBusIds.has(b.id)}>
                     {b.plate_number} ({b.seat_count} مقعد)
+                    {busyBusIds.has(b.id) ? " — مشغولة في هذا التوقيت" : ""}
                   </SelectItem>
                 ))}
+
               </SelectContent>
             </Select>
           </div>
