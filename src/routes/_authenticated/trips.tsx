@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CalendarClock, Plus, Pencil, Trash2, Search, BusFront, MapPin, Loader2, User } from "lucide-react";
 import { CardGridSkeleton } from "@/components/ui/skeletons";
 import { toast } from "sonner";
+import { dbErrorMessage } from "@/lib/db-errors";
 import { supabase } from "@/integrations/supabase/client";
 import { useAgencyId } from "@/hooks/use-agency-id";
 import { Button } from "@/components/ui/button";
@@ -197,7 +198,7 @@ function TripsPage() {
       setEditing(null);
       toast.success("تم الحفظ");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(dbErrorMessage(e)),
   });
 
   const deleteTrip = useMutation({
@@ -215,7 +216,7 @@ function TripsPage() {
       if (e.message.includes("violates foreign key constraint")) {
         toast.error("لا يمكن إتمام العملية لارتباط هذا العنصر ببيانات أخرى (حجوزات أو تذاكر)");
       } else {
-        toast.error(e.message);
+        toast.error(dbErrorMessage(e));
       }
     },
   });
@@ -260,9 +261,11 @@ function TripsPage() {
             routes={routesList ?? []}
             buses={busesList ?? []}
             drivers={driversList ?? []}
+            existingTrips={trips ?? []}
             onSubmit={(f) => upsertTrip.mutate(f)}
             submitting={upsertTrip.isPending}
           />
+
         </Dialog>
       </div>
 
@@ -440,11 +443,14 @@ function TripsPage() {
   );
 }
 
+const CONFLICT_WINDOW_MS = 4 * 60 * 60 * 1000;
+
 function TripFormDialog({
   initial,
   routes,
   buses,
   drivers,
+  existingTrips,
   onSubmit,
   submitting,
 }: {
@@ -452,6 +458,7 @@ function TripFormDialog({
   routes: Array<{ id: string; origin: string; destination: string; default_price: number }>;
   buses: Array<{ id: string; plate_number: string; seat_count: number }>;
   drivers: Array<{ id: string; name: string; status: string }>;
+  existingTrips: Trip[];
   onSubmit: (form: {
     id?: string;
     route_id: string;
@@ -472,6 +479,18 @@ function TripFormDialog({
   const [price, setPrice] = useState(initial?.price ?? 0);
   const [status, setStatus] = useState<TripStatus>(initial?.status ?? "scheduled");
 
+  // الرحلات المتعارضة زمنياً مع الموعد المختار (± 4 ساعات)
+  const overlapping = departure
+    ? existingTrips.filter((t) => {
+        if (t.id === initial?.id) return false;
+        if (t.status === "cancelled" || t.status === "completed") return false;
+        const diff = Math.abs(new Date(t.departure_at).getTime() - new Date(departure).getTime());
+        return diff < CONFLICT_WINDOW_MS;
+      })
+    : [];
+  const busyBusIds = new Set(overlapping.map((t) => t.bus_id));
+  const busyDriverIds = new Set(overlapping.map((t) => t.driver_id).filter(Boolean) as string[]);
+
   return (
     <DialogContent>
       <DialogHeader>
@@ -484,6 +503,15 @@ function TripFormDialog({
           if (!routeId) return toast.error("اختر المسار");
           if (!busId) return toast.error("اختر الحافلة");
           if (!departure) return toast.error("حدد موعد الانطلاق");
+          if (!initial && new Date(departure).getTime() < Date.now() - 60_000) {
+            return toast.error("لا يمكن جدولة رحلة في وقت مضى");
+          }
+          if (busyBusIds.has(busId)) {
+            return toast.error("هذه الحافلة مرتبطة برحلة أخرى في نفس التوقيت — يجب ترك 4 ساعات على الأقل");
+          }
+          if (driverId !== "none" && busyDriverIds.has(driverId)) {
+            return toast.error("هذا السائق مرتبط برحلة أخرى في نفس التوقيت — يجب ترك 4 ساعات على الأقل");
+          }
           onSubmit({
             id: initial?.id,
             route_id: routeId,
@@ -494,6 +522,8 @@ function TripFormDialog({
             status,
           });
         }}
+      >
+
       >
         <div className="space-y-2">
           <Label>المسار *</Label>
@@ -526,17 +556,20 @@ function TripFormDialog({
               </SelectTrigger>
               <SelectContent>
                 {buses.map((b) => (
-                  <SelectItem key={b.id} value={b.id}>
+                  <SelectItem key={b.id} value={b.id} disabled={busyBusIds.has(b.id)}>
                     {b.plate_number} ({b.seat_count} مقعد)
+                    {busyBusIds.has(b.id) ? " — مشغولة في هذا التوقيت" : ""}
                   </SelectItem>
                 ))}
+
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="dep">موعد الانطلاق *</Label>
-            <Input id="dep" type="datetime-local" value={departure} onChange={(e) => setDeparture(e.target.value)} />
+            <Input id="dep" type="datetime-local" value={departure} min={initial ? undefined : new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)} onChange={(e) => setDeparture(e.target.value)} />
           </div>
+
         </div>
         <div className="grid grid-cols-3 gap-3">
           <div className="space-y-2">
@@ -552,10 +585,12 @@ function TripFormDialog({
               <SelectContent>
                 <SelectItem value="none">بدون سائق</SelectItem>
                 {drivers.map((d) => (
-                  <SelectItem key={d.id} value={d.id}>
+                  <SelectItem key={d.id} value={d.id} disabled={busyDriverIds.has(d.id)}>
                     {d.name}
+                    {busyDriverIds.has(d.id) ? " — مشغول" : ""}
                   </SelectItem>
                 ))}
+
               </SelectContent>
             </Select>
           </div>

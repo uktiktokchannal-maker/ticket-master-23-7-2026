@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Ticket, Trash2, CreditCard, Banknote, Smartphone, Search, Loader2, Plus, Minus } from "lucide-react";
 import { CardGridSkeleton } from "@/components/ui/skeletons";
 import { toast } from "sonner";
+import { dbErrorMessage } from "@/lib/db-errors";
 import { supabase } from "@/integrations/supabase/client";
 import { useAgencyId } from "@/hooks/use-agency-id";
 import { useActiveBranch } from "@/hooks/use-active-branch";
@@ -294,7 +295,7 @@ function POSPage() {
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       qc.invalidateQueries({ queryKey: ["shift-sales"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(dbErrorMessage(e)),
   });
 
 

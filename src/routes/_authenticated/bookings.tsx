@@ -6,6 +6,7 @@ import { BookOpen, Plus, Pencil, Trash2, Search, Loader2, Printer, ArrowRightLef
 import { TableSkeleton } from "@/components/ui/skeletons";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
+import { dbErrorMessage } from "@/lib/db-errors";
 import { supabase } from "@/integrations/supabase/client";
 import { useAgencyId } from "@/hooks/use-agency-id";
 import { useActiveBranch } from "@/hooks/use-active-branch";
@@ -180,7 +181,7 @@ function BookingsPage() {
       setEditing(null);
       toast.success("تم الحفظ");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(dbErrorMessage(e)),
   });
 
   const deleteBooking = useMutation({
@@ -194,7 +195,7 @@ function BookingsPage() {
       setConfirmDelete(null);
       toast.success("تم الحذف");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(dbErrorMessage(e)),
   });
 
   const filtered = (bookings ?? []).filter((b) => {
@@ -614,16 +615,30 @@ function BookingFormDialog({
           e.preventDefault();
           if (!name.trim()) return toast.error("اسم المسافر مطلوب");
           if (!tripId) return toast.error("اختر الرحلة");
+          const seatNum = Number(seat) || 0;
+          if (selectedTrip && (seatNum < 1 || seatNum > selectedTrip.capacity)) {
+            return toast.error(`رقم المقعد يجب أن يكون بين 1 و ${selectedTrip.capacity}`);
+          }
+          if (Number(amount) < 0) return toast.error("لا يمكن أن يكون المبلغ سالباً");
+          if (
+            !initial &&
+            status === "confirmed" &&
+            selectedTrip &&
+            new Date(selectedTrip.departure_at).getTime() < Date.now()
+          ) {
+            return toast.error("لا يمكن الحجز على رحلة انقضى موعد انطلاقها");
+          }
           onSubmit({
             id: initial?.id,
             passenger_name: name.trim(),
             passenger_phone: phone.trim() || null,
             trip_id: tripId,
-            seat_number: Number(seat) || 1,
+            seat_number: seatNum || 1,
             amount: Number(amount) || 0,
             status,
           });
         }}
+
       >
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
@@ -669,9 +684,11 @@ function BookingFormDialog({
               id="seat"
               type="number"
               min={1}
+              max={selectedTrip?.capacity}
               value={seat}
               onChange={(e) => setSeat(Number(e.target.value))}
             />
+
           </div>
           <div className="space-y-2">
             <Label htmlFor="amount">المبلغ</Label>
@@ -781,7 +798,7 @@ function RescheduleDialog({
       toast.success("تم إعادة جدولة التذكرة بنجاح");
       onSuccess();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(dbErrorMessage(e)),
   });
 
   const isChanged = newTripId !== booking.trip_id || Number(newSeat) !== booking.seat_number;
