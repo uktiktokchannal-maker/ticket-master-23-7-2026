@@ -684,9 +684,11 @@ function BookingFormDialog({
               id="seat"
               type="number"
               min={1}
+              max={selectedTrip?.capacity}
               value={seat}
               onChange={(e) => setSeat(Number(e.target.value))}
             />
+
           </div>
           <div className="space-y-2">
             <Label htmlFor="amount">المبلغ</Label>
