@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CalendarClock, Plus, Pencil, Trash2, Search, BusFront, MapPin, Loader2, User } from "lucide-react";
 import { CardGridSkeleton } from "@/components/ui/skeletons";
 import { toast } from "sonner";
+import { dbErrorMessage } from "@/lib/db-errors";
 import { supabase } from "@/integrations/supabase/client";
 import { useAgencyId } from "@/hooks/use-agency-id";
 import { Button } from "@/components/ui/button";
@@ -197,7 +198,7 @@ function TripsPage() {
       setEditing(null);
       toast.success("تم الحفظ");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(dbErrorMessage(e)),
   });
 
   const deleteTrip = useMutation({
@@ -215,7 +216,7 @@ function TripsPage() {
       if (e.message.includes("violates foreign key constraint")) {
         toast.error("لا يمكن إتمام العملية لارتباط هذا العنصر ببيانات أخرى (حجوزات أو تذاكر)");
       } else {
-        toast.error(e.message);
+        toast.error(dbErrorMessage(e));
       }
     },
   });

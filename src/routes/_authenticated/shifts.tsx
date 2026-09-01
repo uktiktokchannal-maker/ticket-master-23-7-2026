@@ -14,6 +14,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { dbErrorMessage } from "@/lib/db-errors";
 import { supabase } from "@/integrations/supabase/client";
 import { useAgencyId } from "@/hooks/use-agency-id";
 import { useActiveBranch } from "@/hooks/use-active-branch";
@@ -166,7 +167,7 @@ function ShiftsPage() {
       setOpenDialogOpen(false);
       setOpeningBalance("0");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(dbErrorMessage(e)),
   });
 
   // Close the active shift
@@ -199,7 +200,7 @@ function ShiftsPage() {
       setActualCash("");
       setCloseNotes("");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(dbErrorMessage(e)),
   });
 
   const closedShifts = shifts.filter((s) => s.status === "closed");

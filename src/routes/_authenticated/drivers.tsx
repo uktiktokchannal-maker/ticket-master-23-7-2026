@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { User, Plus, Search, Loader2, Edit, Trash2, Smartphone, IdCard } from "lucide-react";
 import { toast } from "sonner";
+import { dbErrorMessage } from "@/lib/db-errors";
 import { supabase } from "@/integrations/supabase/client";
 import { useAgencyId } from "@/hooks/use-agency-id";
 import { Button } from "@/components/ui/button";
@@ -117,7 +118,7 @@ function DriversPage() {
       qc.invalidateQueries({ queryKey: ["drivers"] });
       setOpen(false);
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(dbErrorMessage(e)),
   });
 
   const deleteMutation = useMutation({
@@ -129,7 +130,7 @@ function DriversPage() {
       toast.success("تم حذف السائق");
       qc.invalidateQueries({ queryKey: ["drivers"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(dbErrorMessage(e)),
   });
 
   return (

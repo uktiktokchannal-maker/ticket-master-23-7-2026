@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Wallet, TrendingUp, TrendingDown, Plus, Loader2, Calendar, Receipt, BusFront, Pencil, Trash2, Filter } from "lucide-react";
 import { toast } from "sonner";
+import { dbErrorMessage } from "@/lib/db-errors";
 import { supabase } from "@/integrations/supabase/client";
 import { useAgencyId } from "@/hooks/use-agency-id";
 import { useActiveBranch } from "@/hooks/use-active-branch";
@@ -201,7 +202,7 @@ function AccountingPage() {
       setOpen(false);
       setEditing(null);
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(dbErrorMessage(e)),
   });
 
   const deleteExpense = useMutation({

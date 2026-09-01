@@ -6,6 +6,7 @@ import { BookOpen, Plus, Pencil, Trash2, Search, Loader2, Printer, ArrowRightLef
 import { TableSkeleton } from "@/components/ui/skeletons";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
+import { dbErrorMessage } from "@/lib/db-errors";
 import { supabase } from "@/integrations/supabase/client";
 import { useAgencyId } from "@/hooks/use-agency-id";
 import { useActiveBranch } from "@/hooks/use-active-branch";
@@ -180,7 +181,7 @@ function BookingsPage() {
       setEditing(null);
       toast.success("تم الحفظ");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(dbErrorMessage(e)),
   });
 
   const deleteBooking = useMutation({
@@ -194,7 +195,7 @@ function BookingsPage() {
       setConfirmDelete(null);
       toast.success("تم الحذف");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(dbErrorMessage(e)),
   });
 
   const filtered = (bookings ?? []).filter((b) => {
@@ -781,7 +782,7 @@ function RescheduleDialog({
       toast.success("تم إعادة جدولة التذكرة بنجاح");
       onSuccess();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(dbErrorMessage(e)),
   });
 
   const isChanged = newTripId !== booking.trip_id || Number(newSeat) !== booking.seat_number;
