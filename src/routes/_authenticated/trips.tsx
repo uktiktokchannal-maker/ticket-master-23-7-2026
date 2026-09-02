@@ -523,8 +523,6 @@ function TripFormDialog({
           });
         }}
       >
-
-      >
         <div className="space-y-2">
           <Label>المسار *</Label>
           <Select
