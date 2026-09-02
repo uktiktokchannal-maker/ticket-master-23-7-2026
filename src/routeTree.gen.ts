@@ -26,6 +26,7 @@ import { Route as AuthenticatedDriversRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedBusesRouteImport } from './routes/_authenticated/buses'
 import { Route as AuthenticatedBranchesRouteImport } from './routes/_authenticated/branches'
+import { Route as AuthenticatedBranchReportsRouteImport } from './routes/_authenticated/branch-reports'
 import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticated/bookings'
 import { Route as AuthenticatedAccountingRouteImport } from './routes/_authenticated/accounting'
 
@@ -114,6 +115,12 @@ const AuthenticatedBranchesRoute = AuthenticatedBranchesRouteImport.update({
   path: '/branches',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBranchReportsRoute =
+  AuthenticatedBranchReportsRouteImport.update({
+    id: '/branch-reports',
+    path: '/branch-reports',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedBookingsRoute = AuthenticatedBookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
@@ -130,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/accounting': typeof AuthenticatedAccountingRoute
   '/bookings': typeof AuthenticatedBookingsRoute
+  '/branch-reports': typeof AuthenticatedBranchReportsRoute
   '/branches': typeof AuthenticatedBranchesRoute
   '/buses': typeof AuthenticatedBusesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -150,6 +158,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/accounting': typeof AuthenticatedAccountingRoute
   '/bookings': typeof AuthenticatedBookingsRoute
+  '/branch-reports': typeof AuthenticatedBranchReportsRoute
   '/branches': typeof AuthenticatedBranchesRoute
   '/buses': typeof AuthenticatedBusesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -172,6 +181,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/accounting': typeof AuthenticatedAccountingRoute
   '/_authenticated/bookings': typeof AuthenticatedBookingsRoute
+  '/_authenticated/branch-reports': typeof AuthenticatedBranchReportsRoute
   '/_authenticated/branches': typeof AuthenticatedBranchesRoute
   '/_authenticated/buses': typeof AuthenticatedBusesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/accounting'
     | '/bookings'
+    | '/branch-reports'
     | '/branches'
     | '/buses'
     | '/dashboard'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/accounting'
     | '/bookings'
+    | '/branch-reports'
     | '/branches'
     | '/buses'
     | '/dashboard'
@@ -235,6 +247,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/accounting'
     | '/_authenticated/bookings'
+    | '/_authenticated/branch-reports'
     | '/_authenticated/branches'
     | '/_authenticated/buses'
     | '/_authenticated/dashboard'
@@ -378,6 +391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBranchesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/branch-reports': {
+      id: '/_authenticated/branch-reports'
+      path: '/branch-reports'
+      fullPath: '/branch-reports'
+      preLoaderRoute: typeof AuthenticatedBranchReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/bookings': {
       id: '/_authenticated/bookings'
       path: '/bookings'
@@ -398,6 +418,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountingRoute: typeof AuthenticatedAccountingRoute
   AuthenticatedBookingsRoute: typeof AuthenticatedBookingsRoute
+  AuthenticatedBranchReportsRoute: typeof AuthenticatedBranchReportsRoute
   AuthenticatedBranchesRoute: typeof AuthenticatedBranchesRoute
   AuthenticatedBusesRoute: typeof AuthenticatedBusesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -417,6 +438,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountingRoute: AuthenticatedAccountingRoute,
   AuthenticatedBookingsRoute: AuthenticatedBookingsRoute,
+  AuthenticatedBranchReportsRoute: AuthenticatedBranchReportsRoute,
   AuthenticatedBranchesRoute: AuthenticatedBranchesRoute,
   AuthenticatedBusesRoute: AuthenticatedBusesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,

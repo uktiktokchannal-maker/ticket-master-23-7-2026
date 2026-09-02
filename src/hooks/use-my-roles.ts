@@ -15,8 +15,8 @@ export const ROLE_ALLOWED_PATHS: Record<AppRole, string[] | "*"> = {
   owner: "*",
   manager: "*",
   cashier: ["/dashboard", "/pos", "/bookings", "/trips", "/manifest", "/shifts", "/notifications"],
-  accountant: ["/dashboard", "/bookings", "/accounting", "/shifts", "/reports", "/notifications"],
-  supervisor: ["/dashboard", "/bookings", "/trips", "/manifest", "/reports", "/notifications"],
+  accountant: ["/dashboard", "/bookings", "/accounting", "/shifts", "/reports", "/branch-reports", "/notifications"],
+  supervisor: ["/dashboard", "/bookings", "/trips", "/manifest", "/reports", "/branch-reports", "/notifications"],
   broker: ["/dashboard", "/pos", "/bookings", "/notifications"],
   inspector: ["/dashboard", "/manifest", "/bookings", "/trips", "/notifications"],
 };
