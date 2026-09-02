@@ -279,6 +279,9 @@ function BusFormDialog({
         onSubmit={(e) => {
           e.preventDefault();
           if (!plate.trim()) return toast.error("رقم اللوحة مطلوب");
+          if (!Number(seats) || Number(seats) < 1) {
+            return toast.error("عدد المقاعد يجب أن يكون 1 على الأقل");
+          }
           onSubmit({
             id: initial?.id,
             plate_number: plate.trim(),

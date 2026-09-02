@@ -260,6 +260,15 @@ function RouteFormDialog({
           if (!origin.trim() || !destination.trim()) {
             return toast.error("المدينتان مطلوبتان");
           }
+          if (origin.trim() === destination.trim()) {
+            return toast.error("نقطة الانطلاق يجب أن تختلف عن الوجهة");
+          }
+          if (distance && Number(distance) < 0) {
+            return toast.error("المسافة لا يمكن أن تكون سالبة");
+          }
+          if (Number(price) < 0) {
+            return toast.error("السعر لا يمكن أن يكون سالباً");
+          }
           onSubmit({
             id: initial?.id,
             origin: origin.trim(),
