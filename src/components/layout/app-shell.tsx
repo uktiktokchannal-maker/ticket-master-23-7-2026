@@ -66,6 +66,7 @@ const NAV: NavGroup[] = [
       { to: "/accounting", label: "المحاسبة", icon: Wallet },
       { to: "/shifts", label: "الورديات", icon: Clock },
       { to: "/reports", label: "التقارير", icon: BarChart3 },
+      { to: "/branch-reports", label: "تقارير الفروع", icon: Building2 },
     ],
   },
   {
