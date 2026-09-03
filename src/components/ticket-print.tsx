@@ -176,17 +176,25 @@ function Row({
 
 function printTickets() {
   document.body.classList.add("tickets-print-mode");
+  // Named @page rules are unreliable across print engines — inject a global
+  // landscape A5 page size only for the duration of this print job.
+  const style = document.createElement("style");
+  style.id = "ticket-print-page-style";
+  style.textContent = "@page { size: A5 landscape; margin: 3mm; }";
+  document.head.appendChild(style);
+
   let done = false;
   const cleanup = () => {
     if (done) return;
     done = true;
     document.body.classList.remove("tickets-print-mode");
-    window.removeEventListener("afterprint", cleanup);
+    document.getElementById("ticket-print-page-style")?.remove();
+    window.removeEventListener("afterprint", onAfterPrint);
   };
-  window.addEventListener("afterprint", cleanup);
+  const onAfterPrint = () => cleanup();
+  window.addEventListener("afterprint", onAfterPrint);
   // Fallback for browsers that don't fire afterprint reliably
-  const fallback = window.setTimeout(cleanup, 120_000);
-  window.addEventListener("afterprint", () => window.clearTimeout(fallback), { once: true });
+  window.setTimeout(cleanup, 120_000);
   // Give the browser a tick to apply print styles before opening the dialog
   requestAnimationFrame(() => setTimeout(() => window.print(), 50));
 }
