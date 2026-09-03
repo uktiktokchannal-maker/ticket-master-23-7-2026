@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { QRCodeSVG } from "qrcode.react";
 import { Printer, User, Bus, Armchair, CalendarDays, Clock, Ticket as TicketIcon, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -173,6 +174,23 @@ function Row({
   );
 }
 
+function printTickets() {
+  document.body.classList.add("tickets-print-mode");
+  let done = false;
+  const cleanup = () => {
+    if (done) return;
+    done = true;
+    document.body.classList.remove("tickets-print-mode");
+    window.removeEventListener("afterprint", cleanup);
+  };
+  window.addEventListener("afterprint", cleanup);
+  // Fallback for browsers that don't fire afterprint reliably
+  const fallback = window.setTimeout(cleanup, 120_000);
+  window.addEventListener("afterprint", () => window.clearTimeout(fallback), { once: true });
+  // Give the browser a tick to apply print styles before opening the dialog
+  requestAnimationFrame(() => setTimeout(() => window.print(), 50));
+}
+
 /** Renders a list of tickets and a print button. Used in POS after checkout and in bookings list. */
 export function TicketPrintView({
   tickets,
@@ -193,27 +211,29 @@ export function TicketPrintView({
               إغلاق
             </Button>
           )}
-          <Button
-            onClick={() => {
-              document.body.classList.add("tickets-print-mode");
-              const cleanup = () => {
-                document.body.classList.remove("tickets-print-mode");
-                window.removeEventListener("afterprint", cleanup);
-              };
-              window.addEventListener("afterprint", cleanup);
-              setTimeout(() => window.print(), 60);
-            }}
-          >
+          <Button onClick={printTickets}>
             <Printer className="me-2 h-4 w-4" />
             طباعة
           </Button>
         </div>
       </div>
+      {/* Screen preview */}
       <div className="tickets-print-area space-y-6">
         {tickets.map((t) => (
           <TicketCard key={t.id} t={t} />
         ))}
       </div>
+      {/* Print-only copy mounted directly under <body> so print CSS can hide everything else */}
+      {createPortal(
+        <div className="tickets-print-root" aria-hidden>
+          <div className="tickets-print-area">
+            {tickets.map((t) => (
+              <TicketCard key={t.id} t={t} />
+            ))}
+          </div>
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }

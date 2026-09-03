@@ -175,6 +175,11 @@
   }
 }
 
+/* Print-only ticket portal: hidden on screen, shown only via tickets-print-mode */
+.tickets-print-root {
+  display: none;
+}
+
 @layer utilities {
   .ticket-shape {
     position: relative;
@@ -379,37 +384,55 @@
     margin: 2mm 0;
   }
 
-  /* === Tickety printable ticket (landscape) === */
-  @page ticket {
-    size: A5 landscape;
-    margin: 6mm;
-  }
+  /* === Tickety printable ticket (landscape) ===
+     The @page size is injected via JS (printTickets) because named pages
+     are unreliable across print engines. */
   body.tickets-print-mode {
     background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
-  body.tickets-print-mode * {
-    visibility: hidden !important;
+  /* hide everything except the ticket area, without display:none (keeps layout) */
+  body.tickets-print-mode > * {
+    display: none !important;
   }
-  body.tickets-print-mode .tickets-print-area,
-  body.tickets-print-mode .tickets-print-area * {
+  body.tickets-print-mode .tickets-print-root,
+  body.tickets-print-mode .tickets-print-root * {
     visibility: visible !important;
   }
+  body.tickets-print-mode .tickets-print-root {
+    display: block !important;
+    position: static !important;
+  }
   body.tickets-print-mode .tickets-print-area {
-    position: fixed !important;
-    inset: 0 !important;
+    position: static !important;
+    display: block !important;
     margin: 0 !important;
     padding: 0 !important;
     background: white !important;
-    z-index: 99999 !important;
     overflow: visible !important;
+  }
+  body.tickets-print-mode .tickets-print-area > * + * {
+    margin-top: 0 !important;
   }
   body.tickets-print-mode .ticket-printable {
     page: ticket;
+    break-after: page;
     page-break-after: always;
-    box-shadow: none !important;
-    width: 100% !important;
-    max-width: 100% !important;
     break-inside: avoid;
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    height: 148mm !important;
+    aspect-ratio: auto !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+  body.tickets-print-mode .ticket-printable:last-child {
+    break-after: auto;
+    page-break-after: auto;
   }
 
 }
