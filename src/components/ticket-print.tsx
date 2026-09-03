@@ -52,7 +52,7 @@ export function TicketCard({ t }: { t: TicketData }) {
       </div>
 
       {/* Body — blue background, two panels */}
-      <div className="grid min-h-0 flex-1 grid-cols-[1.15fr_1fr] gap-4 bg-[#062E5B] p-5">
+      <div className="grid min-h-0 flex-1 grid-cols-[1.15fr_1fr] gap-4 overflow-hidden bg-[#062E5B] p-4">
         {/* LEFT — Data card */}
         <div className="relative rounded-2xl bg-white p-4 shadow-inner">
           {/* perforation dot */}
