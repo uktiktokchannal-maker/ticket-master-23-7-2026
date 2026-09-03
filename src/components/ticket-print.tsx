@@ -138,8 +138,8 @@ export function TicketCard({ t }: { t: TicketData }) {
       </div>
 
       {/* Footer */}
-      <div className="shrink-0 bg-white py-3 text-center">
-        <p className="font-extrabold text-[#062E5B] text-lg">
+      <div className="flex h-[52px] shrink-0 items-center justify-center bg-white px-4 pb-1 text-center">
+        <p className="font-extrabold text-[#062E5B] text-lg leading-[1.6]">
           دقة في المواعيد — <span className="text-[#FF8500]">راحة في الطريق</span>
         </p>
       </div>
