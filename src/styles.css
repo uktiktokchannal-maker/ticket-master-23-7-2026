@@ -416,18 +416,17 @@
     margin-top: 0 !important;
   }
   body.tickets-print-mode .ticket-printable {
-    page: ticket;
     break-after: page;
     page-break-after: always;
     break-inside: avoid;
     page-break-inside: avoid;
     box-shadow: none !important;
-    border-radius: 0 !important;
-    width: 210mm !important;
-    max-width: 210mm !important;
-    height: 148mm !important;
+    /* Slightly smaller than A5 landscape (210x148) so nothing spills to the next page */
+    width: 204mm !important;
+    max-width: 204mm !important;
+    height: 142mm !important;
     aspect-ratio: auto !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     overflow: hidden !important;
   }
   body.tickets-print-mode .ticket-printable:last-child {
