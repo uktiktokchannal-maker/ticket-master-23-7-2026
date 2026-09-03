@@ -39,11 +39,11 @@ export function TicketCard({ t }: { t: TicketData }) {
   return (
     <div
       dir="rtl"
-      className="ticket-printable relative mx-auto w-full max-w-[1100px] overflow-hidden rounded-[28px] bg-white text-[#062E5B] shadow-[0_20px_60px_-20px_rgba(6,46,91,0.35)]"
+      className="ticket-printable relative mx-auto flex w-full max-w-[1100px] flex-col overflow-hidden rounded-[28px] bg-white text-[#062E5B] shadow-[0_20px_60px_-20px_rgba(6,46,91,0.35)]"
       style={{ fontFamily: "Cairo, sans-serif", aspectRatio: "210 / 148" }}
     >
       {/* Header band */}
-      <div className="flex items-center justify-between border-b-[3px] border-[#008FC7] bg-white px-6 py-3">
+      <div className="flex shrink-0 items-center justify-between border-b-[3px] border-[#008FC7] bg-white px-6 py-3">
         <img src={logo.url} alt="TICKETTY" className="h-14 w-auto object-contain" />
         <p className="text-center font-extrabold text-[#062E5B] text-lg sm:text-xl">
           تطبيق حجز تذاكر البصات السفرية
@@ -52,7 +52,7 @@ export function TicketCard({ t }: { t: TicketData }) {
       </div>
 
       {/* Body — blue background, two panels */}
-      <div className="grid h-[calc(100%-120px)] grid-cols-[1.15fr_1fr] gap-4 bg-[#062E5B] p-5">
+      <div className="grid min-h-0 flex-1 grid-cols-[1.15fr_1fr] gap-4 bg-[#062E5B] p-5">
         {/* LEFT — Data card */}
         <div className="relative rounded-2xl bg-white p-4 shadow-inner">
           {/* perforation dot */}

@@ -392,8 +392,10 @@
     margin: 0 !important;
     padding: 0 !important;
   }
-  /* hide everything except the ticket area, without display:none (keeps layout) */
-  body.tickets-print-mode > * {
+  /* hide everything except the ticket print portal — must override the
+     generic `.flex.min-h-dvh { display:block }` print rule above */
+  body.tickets-print-mode > *:not(.tickets-print-root),
+  body.tickets-print-mode .flex.min-h-dvh {
     display: none !important;
   }
   body.tickets-print-mode .tickets-print-root,
