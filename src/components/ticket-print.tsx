@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { QRCodeSVG } from "qrcode.react";
 import { Printer, User, Bus, Armchair, CalendarDays, Clock, Ticket as TicketIcon, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -38,11 +39,11 @@ export function TicketCard({ t }: { t: TicketData }) {
   return (
     <div
       dir="rtl"
-      className="ticket-printable relative mx-auto w-full max-w-[1100px] overflow-hidden rounded-[28px] bg-white text-[#062E5B] shadow-[0_20px_60px_-20px_rgba(6,46,91,0.35)]"
+      className="ticket-printable relative mx-auto flex w-full max-w-[1100px] flex-col overflow-hidden rounded-[28px] bg-white text-[#062E5B] shadow-[0_20px_60px_-20px_rgba(6,46,91,0.35)]"
       style={{ fontFamily: "Cairo, sans-serif", aspectRatio: "210 / 148" }}
     >
       {/* Header band */}
-      <div className="flex items-center justify-between border-b-[3px] border-[#008FC7] bg-white px-6 py-3">
+      <div className="flex shrink-0 items-center justify-between border-b-[3px] border-[#008FC7] bg-white px-6 py-3">
         <img src={logo.url} alt="TICKETTY" className="h-14 w-auto object-contain" />
         <p className="text-center font-extrabold text-[#062E5B] text-lg sm:text-xl">
           تطبيق حجز تذاكر البصات السفرية
@@ -51,7 +52,7 @@ export function TicketCard({ t }: { t: TicketData }) {
       </div>
 
       {/* Body — blue background, two panels */}
-      <div className="grid h-[calc(100%-120px)] grid-cols-[1.15fr_1fr] gap-4 bg-[#062E5B] p-5">
+      <div className="grid min-h-0 flex-1 grid-cols-[1.15fr_1fr] gap-4 overflow-hidden bg-[#062E5B] p-4">
         {/* LEFT — Data card */}
         <div className="relative rounded-2xl bg-white p-4 shadow-inner">
           {/* perforation dot */}
@@ -137,8 +138,8 @@ export function TicketCard({ t }: { t: TicketData }) {
       </div>
 
       {/* Footer */}
-      <div className="bg-white py-3 text-center">
-        <p className="font-extrabold text-[#062E5B] text-lg">
+      <div className="flex h-[52px] shrink-0 items-center justify-center bg-white px-4 pb-1 text-center">
+        <p className="font-extrabold text-[#062E5B] text-lg leading-[1.6]">
           دقة في المواعيد — <span className="text-[#FF8500]">راحة في الطريق</span>
         </p>
       </div>
@@ -173,6 +174,31 @@ function Row({
   );
 }
 
+function printTickets() {
+  document.body.classList.add("tickets-print-mode");
+  // Named @page rules are unreliable across print engines — inject a global
+  // landscape A5 page size only for the duration of this print job.
+  const style = document.createElement("style");
+  style.id = "ticket-print-page-style";
+  style.textContent = "@page { size: A5 landscape; margin: 3mm; }";
+  document.head.appendChild(style);
+
+  let done = false;
+  const cleanup = () => {
+    if (done) return;
+    done = true;
+    document.body.classList.remove("tickets-print-mode");
+    document.getElementById("ticket-print-page-style")?.remove();
+    window.removeEventListener("afterprint", onAfterPrint);
+  };
+  const onAfterPrint = () => cleanup();
+  window.addEventListener("afterprint", onAfterPrint);
+  // Fallback for browsers that don't fire afterprint reliably
+  window.setTimeout(cleanup, 120_000);
+  // Give the browser a tick to apply print styles before opening the dialog
+  requestAnimationFrame(() => setTimeout(() => window.print(), 50));
+}
+
 /** Renders a list of tickets and a print button. Used in POS after checkout and in bookings list. */
 export function TicketPrintView({
   tickets,
@@ -193,27 +219,29 @@ export function TicketPrintView({
               إغلاق
             </Button>
           )}
-          <Button
-            onClick={() => {
-              document.body.classList.add("tickets-print-mode");
-              const cleanup = () => {
-                document.body.classList.remove("tickets-print-mode");
-                window.removeEventListener("afterprint", cleanup);
-              };
-              window.addEventListener("afterprint", cleanup);
-              setTimeout(() => window.print(), 60);
-            }}
-          >
+          <Button onClick={printTickets}>
             <Printer className="me-2 h-4 w-4" />
             طباعة
           </Button>
         </div>
       </div>
+      {/* Screen preview */}
       <div className="tickets-print-area space-y-6">
         {tickets.map((t) => (
           <TicketCard key={t.id} t={t} />
         ))}
       </div>
+      {/* Print-only copy mounted directly under <body> so print CSS can hide everything else */}
+      {createPortal(
+        <div className="tickets-print-root" aria-hidden>
+          <div className="tickets-print-area">
+            {tickets.map((t) => (
+              <TicketCard key={t.id} t={t} />
+            ))}
+          </div>
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }

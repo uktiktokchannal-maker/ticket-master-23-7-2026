@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
+import { Route as AuthenticatedTicketTestRouteImport } from './routes/_authenticated/ticket-test'
 import { Route as AuthenticatedShiftsRouteImport } from './routes/_authenticated/shifts'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSearchRouteImport } from './routes/_authenticated/search'
@@ -47,6 +48,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedTripsRoute = AuthenticatedTripsRouteImport.update({
   id: '/trips',
   path: '/trips',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTicketTestRoute = AuthenticatedTicketTestRouteImport.update({
+  id: '/ticket-test',
+  path: '/ticket-test',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedShiftsRoute = AuthenticatedShiftsRouteImport.update({
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof AuthenticatedSearchRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/shifts': typeof AuthenticatedShiftsRoute
+  '/ticket-test': typeof AuthenticatedTicketTestRoute
   '/trips': typeof AuthenticatedTripsRoute
 }
 export interface FileRoutesByTo {
@@ -172,6 +179,7 @@ export interface FileRoutesByTo {
   '/search': typeof AuthenticatedSearchRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/shifts': typeof AuthenticatedShiftsRoute
+  '/ticket-test': typeof AuthenticatedTicketTestRoute
   '/trips': typeof AuthenticatedTripsRoute
 }
 export interface FileRoutesById {
@@ -195,6 +203,7 @@ export interface FileRoutesById {
   '/_authenticated/search': typeof AuthenticatedSearchRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/shifts': typeof AuthenticatedShiftsRoute
+  '/_authenticated/ticket-test': typeof AuthenticatedTicketTestRoute
   '/_authenticated/trips': typeof AuthenticatedTripsRoute
 }
 export interface FileRouteTypes {
@@ -218,6 +227,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/settings'
     | '/shifts'
+    | '/ticket-test'
     | '/trips'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/settings'
     | '/shifts'
+    | '/ticket-test'
     | '/trips'
   id:
     | '__root__'
@@ -261,6 +272,7 @@ export interface FileRouteTypes {
     | '/_authenticated/search'
     | '/_authenticated/settings'
     | '/_authenticated/shifts'
+    | '/_authenticated/ticket-test'
     | '/_authenticated/trips'
   fileRoutesById: FileRoutesById
 }
@@ -298,6 +310,13 @@ declare module '@tanstack/react-router' {
       path: '/trips'
       fullPath: '/trips'
       preLoaderRoute: typeof AuthenticatedTripsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ticket-test': {
+      id: '/_authenticated/ticket-test'
+      path: '/ticket-test'
+      fullPath: '/ticket-test'
+      preLoaderRoute: typeof AuthenticatedTicketTestRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/shifts': {
@@ -432,6 +451,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSearchRoute: typeof AuthenticatedSearchRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedShiftsRoute: typeof AuthenticatedShiftsRoute
+  AuthenticatedTicketTestRoute: typeof AuthenticatedTicketTestRoute
   AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
 }
 
@@ -452,6 +472,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSearchRoute: AuthenticatedSearchRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedShiftsRoute: AuthenticatedShiftsRoute,
+  AuthenticatedTicketTestRoute: AuthenticatedTicketTestRoute,
   AuthenticatedTripsRoute: AuthenticatedTripsRoute,
 }
 
