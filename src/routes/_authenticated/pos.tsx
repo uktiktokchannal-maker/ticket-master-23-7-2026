@@ -234,7 +234,9 @@ function POSPage() {
   }
 
   const subtotal = cart.reduce((s, c) => s + c.trip.price, 0);
-  const total = Math.max(0, subtotal - discount);
+  const maxDiscount = Math.floor(subtotal * 0.5);
+  const effectiveDiscount = Math.min(discount, maxDiscount);
+  const total = Math.max(0, subtotal - effectiveDiscount);
 
   const checkoutMutation = useMutation({
     mutationFn: async () => {
@@ -242,7 +244,7 @@ function POSPage() {
       if (!activeBranchId) throw new Error("لم يتم تحديد الفرع");
       if (cart.length === 0) throw new Error("السلة فارغة");
 
-      const perTicketDiscount = cart.length > 0 ? Math.floor(discount / cart.length) : 0;
+      const perTicketDiscount = cart.length > 0 ? Math.floor(effectiveDiscount / cart.length) : 0;
 
       const bookings = cart.map((c) => ({
         agency_id: agencyId,
@@ -481,13 +483,13 @@ function POSPage() {
               <div className="flex items-center justify-between gap-2 text-muted-foreground">
                 <span>خصم</span>
                 <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => setDiscount((d) => Math.max(0, d - 500))}>
+                  <Button variant="ghost" size="sm" onClick={() => setDiscount((d) => Math.max(0, d - 500))} disabled={effectiveDiscount <= 0}>
                     <Minus className="h-3 w-3" />
                   </Button>
                   <span className="tabular w-16 text-center font-semibold text-foreground">
-                    {discount.toLocaleString("ar-EG")}
+                    {effectiveDiscount.toLocaleString("ar-EG")}
                   </span>
-                  <Button variant="ghost" size="sm" onClick={() => setDiscount((d) => d + 500)}>
+                  <Button variant="ghost" size="sm" onClick={() => setDiscount((d) => Math.min(maxDiscount, d + 500))} disabled={effectiveDiscount >= maxDiscount}>
                     <Plus className="h-3 w-3" />
                   </Button>
                 </div>

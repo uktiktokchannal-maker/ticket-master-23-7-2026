@@ -620,6 +620,14 @@ function BookingFormDialog({
             return toast.error(`رقم المقعد يجب أن يكون بين 1 و ${selectedTrip.capacity}`);
           }
           if (Number(amount) < 0) return toast.error("لا يمكن أن يكون المبلغ سالباً");
+          if (status === "confirmed" && selectedTrip) {
+            if (Number(amount) > selectedTrip.price) {
+              return toast.error(`المبلغ لا يمكن أن يتجاوز سعر الرحلة (${selectedTrip.price.toLocaleString("ar-EG")})`);
+            }
+            if (Number(amount) < selectedTrip.price * 0.5) {
+              return toast.error("الخصم لا يمكن أن يتجاوز 50% من سعر الرحلة");
+            }
+          }
           if (
             !initial &&
             status === "confirmed" &&
