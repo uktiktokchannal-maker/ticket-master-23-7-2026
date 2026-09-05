@@ -26,12 +26,19 @@ function SearchPage() {
     queryFn: async () => {
       if (!q || q.length < 2) return { bookings: [], trips: [] };
 
-      // Search bookings (by passenger name or phone)
-      const { data: bookings } = await supabase
-        .from("bookings")
-        .select("id, passenger_name, passenger_phone, seat_number, status, amount, trips(routes(origin, destination), departure_at)")
-        .or(`passenger_name.ilike.%${q}%,passenger_phone.ilike.%${q}%`)
-        .limit(10);
+      // Parameterized filters — user text is never interpolated into raw filter syntax.
+      const pattern = `%${q}%`;
+      const select = "id, passenger_name, passenger_phone, seat_number, status, amount, trips(routes(origin, destination), departure_at)";
+      const [byName, byPhone] = await Promise.all([
+        supabase.from("bookings").select(select).ilike("passenger_name", pattern).limit(10),
+        supabase.from("bookings").select(select).ilike("passenger_phone", pattern).limit(10),
+      ]);
+      const seen = new Set<string>();
+      const bookings = [...(byName.data ?? []), ...(byPhone.data ?? [])].filter((b) => {
+        if (seen.has(b.id)) return false;
+        seen.add(b.id);
+        return true;
+      }).slice(0, 10);
 
       // Search trips (by route or bus)
       // Since it's hard to text search across joined tables in a simple RPC without one,
