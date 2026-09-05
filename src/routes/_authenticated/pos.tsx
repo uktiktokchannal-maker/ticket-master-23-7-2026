@@ -244,7 +244,7 @@ function POSPage() {
       if (!activeBranchId) throw new Error("لم يتم تحديد الفرع");
       if (cart.length === 0) throw new Error("السلة فارغة");
 
-      const perTicketDiscount = cart.length > 0 ? Math.floor(discount / cart.length) : 0;
+      const perTicketDiscount = cart.length > 0 ? Math.floor(effectiveDiscount / cart.length) : 0;
 
       const bookings = cart.map((c) => ({
         agency_id: agencyId,
@@ -487,7 +487,7 @@ function POSPage() {
                     <Minus className="h-3 w-3" />
                   </Button>
                   <span className="tabular w-16 text-center font-semibold text-foreground">
-                    {discount.toLocaleString("ar-EG")}
+                    {effectiveDiscount.toLocaleString("ar-EG")}
                   </span>
                   <Button variant="ghost" size="sm" onClick={() => setDiscount((d) => d + 500)}>
                     <Plus className="h-3 w-3" />
