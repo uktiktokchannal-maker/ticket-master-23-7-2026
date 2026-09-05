@@ -489,7 +489,7 @@ function POSPage() {
                   <span className="tabular w-16 text-center font-semibold text-foreground">
                     {effectiveDiscount.toLocaleString("ar-EG")}
                   </span>
-                  <Button variant="ghost" size="sm" onClick={() => setDiscount((d) => d + 500)}>
+                  <Button variant="ghost" size="sm" onClick={() => setDiscount((d) => Math.min(maxDiscount, d + 500))} disabled={effectiveDiscount >= maxDiscount}>
                     <Plus className="h-3 w-3" />
                   </Button>
                 </div>
